@@ -47,7 +47,7 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
         <Modal
             isOpen={modelState.isOpen}
             onDismiss={hideModal}
-            isBlocking={false}
+            isBlocking={true}
             styles={modalStyles}
         >
             <Stack horizontalAlign="space-between">

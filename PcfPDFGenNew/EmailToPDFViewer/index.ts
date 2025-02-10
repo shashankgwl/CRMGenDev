@@ -22,7 +22,7 @@ export class EmailToPDFViewer implements ComponentFramework.ReactControl<IInputs
     }
 
     private hasValidAttributeValue(value: string | null): boolean {
-        return value !== '' && value !== null && value !== "0";
+        return value === "1";
     }
 
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
