@@ -6,19 +6,6 @@ function openRecordVersions(recId) {
 
     recId = recId.replace("{", "").replace("}", "");
 
-    // var alertStrings = { text: "Record ID: " + recId, title: "GUID Information" };
-    // var alertOptions = { height: 200, width: 400 };
-
-    // Xrm.Navigation.openAlertDialog(alertStrings, alertOptions).then(
-    //     function (success) {
-    //         console.log("Alert dialog closed");
-    //     },
-    //     function (error) {
-    //         console.log("Error opening alert dialog: " + error.message);
-    //     }
-    // );
-
-
     var pageInput = {
         pageType: "custom",
         name: "new_recordversions_c6a51", // Replace with your custom page name
