@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import html2pdf from 'html2pdf.js';
 
-import { getTheme, Modal, IconButton, IIconProps, FontWeights, IButtonStyles, Stack, List, Icon, ITheme, mergeStyleSets, getFocusStyle } from "@fluentui/react";
+import { getTheme, Modal, IconButton, IIconProps, FontWeights, IButtonStyles, Stack, List, ITheme, mergeStyleSets, getFocusStyle } from "@fluentui/react";
 import { IPDFGenProps } from "../Model/IPDFGenProps";
 
 const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
@@ -217,5 +217,3 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
 };
 
 export { EmailTemplateToPDF };
-// Remove the placeholder function
-
