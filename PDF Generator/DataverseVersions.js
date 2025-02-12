@@ -4,12 +4,21 @@ function openRecordVersions(recId) {
         return;
     }
 
-<<<<<<< HEAD
     recId = recId.replace("{", "").replace("}", "");
 
-=======
-    recId = recId.replace("{", "").replace("}", "");   
->>>>>>> 3585b4728be3a64ac113f2b7a8a300b1d710561a
+    // var alertStrings = { text: "Record ID: " + recId, title: "GUID Information" };
+    // var alertOptions = { height: 200, width: 400 };
+
+    // Xrm.Navigation.openAlertDialog(alertStrings, alertOptions).then(
+    //     function (success) {
+    //         console.log("Alert dialog closed");
+    //     },
+    //     function (error) {
+    //         console.log("Error opening alert dialog: " + error.message);
+    //     }
+    // );
+
+
     var pageInput = {
         pageType: "custom",
         name: "new_recordversions_c6a51", // Replace with your custom page name
@@ -34,6 +43,7 @@ function openRecordVersions(recId) {
 }
 
 function showPCF(executionContext) {
+    //let newguid = generateGUID();
     executionContext.getAttribute("new_emailtemplate").setValue("1");
 }
 
