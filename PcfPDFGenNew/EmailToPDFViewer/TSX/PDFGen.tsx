@@ -1,5 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
+import html2pdf from 'html2pdf.js';
+
 import { getTheme, Modal, IconButton, IIconProps, FontWeights, IButtonStyles, Stack, List, Icon, getRTL, ITheme, mergeStyleSets, getFocusStyle } from "@fluentui/react";
 import { IPDFGenProps } from "../Model/IPDFGenProps";
 
@@ -87,6 +89,42 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
         modelState.onChange('');
     };
 
+    const convertHtmlToPDF = async (html: string | null): Promise<void> => {
+        try {
+            const pdf = await html2pdf()
+                .from(html)
+                .set({
+                    margin: 1,
+                    filename: 'document.pdf',
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                })
+                .toPdf()
+                .get('pdf');
+            const blob = pdf.output('blob');
+            const url = URL.createObjectURL(blob);
+            window.open(url);
+        } catch (error) {
+            console.error("Failed to convert HTML to PDF:", error);
+            throw error;
+        }
+    }
+    useEffect(() => {
+        if (props.isOpen) {
+            setModelState({ ...modelState, isOpen: props.isOpen });
+            getEmailTemplates()
+                .then((templates) => {
+                    setModelState((prevState) => ({ ...prevState, emailTemplates: templates }));
+                    return templates;
+                })
+                .catch((error) => {
+                    console.error("Failed to fetch email templates:", error);
+                    throw error;
+                });
+        } else {
+            setModelState({ ...modelState, isOpen: props.isOpen });
+        }
+    }, [props.isOpen]);
     const onRenderCell = React.useCallback(
         (item?: IEmailTemplate, index?: number | undefined, isScrolling?: boolean): React.ReactNode => {
             if (!item) {
@@ -97,10 +135,9 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
 
                     <div className={classNames.itemContent}>
                         <div className={classNames.itemName}>{item.title}</div>
-                        <div className={classNames.itemIndex}>{`Item ${index}`}</div>
                         <div>{item.description}</div>
                     </div>
-                    <Icon className={classNames.chevron} iconName={getRTL() ? 'ChevronLeft' : 'ChevronRight'} />
+                    <Icon className={classNames.chevron} iconName={getRTL() ? 'ChevronLeft' : 'ChevronRight'} onClick={async () => await convertHtmlToPDF(item.safehtml)} />
                 </div>
             );
         },
@@ -173,3 +210,5 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
 };
 
 export { EmailTemplateToPDF };
+// Remove the placeholder function
+

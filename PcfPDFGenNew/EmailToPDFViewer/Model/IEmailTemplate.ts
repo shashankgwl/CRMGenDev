@@ -1,6 +1,6 @@
 interface IEmailTemplate {
     templateId: string | null;
-    safeHTML : string | null;
+    safehtml : string | null;
     title: string | null;
     description: string | null;
 }
