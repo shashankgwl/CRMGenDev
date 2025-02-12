@@ -16,6 +16,7 @@
     "@fluentui/react": "^8.122.9",
     "@fluentui/react-components": "9.46.2",
     "html2pdf": "^0.0.11",
+    "html2pdf.js": "^0.10.2",
     "react": "16.14.0",
     "react-dom": "16.14.0"
   },
