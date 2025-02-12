@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import html2pdf from 'html2pdf.js';
-
 import { getTheme, Modal, IconButton, IIconProps, FontWeights, IButtonStyles, Stack, List, ITheme, mergeStyleSets, getFocusStyle } from "@fluentui/react";
 import { IPDFGenProps } from "../Model/IPDFGenProps";
 
@@ -128,7 +127,7 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
 
     
     const onRenderCell = React.useCallback(
-        (item?: IEmailTemplate, index?: number | undefined, isScrolling?: boolean): React.ReactNode => {
+        (item?: IEmailTemplate, _index?: number | undefined): React.ReactNode => {
             if (!item) {
                 return null;
             }
@@ -176,7 +175,7 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
 
         getEmailTemplates()
             .then((templates) => {
-                return setModelState({ ...modelState, emailTemplates: templates, isOpen: props.isOpen }); // ✅ Now returns
+                return setModelState({ ...modelState, emailTemplates: templates, isOpen: props.isOpen });
             })
             .catch((error) => {
                 console.error("Failed to fetch email templates:", error);
