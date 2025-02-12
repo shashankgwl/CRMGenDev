@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { getTheme, Modal, IconButton, IIconProps, FontWeights, IButtonStyles, Stack, List, Icon, getRTL, ITheme, mergeStyleSets, getFocusStyle } from "@fluentui/react";
-import { IPDFGenProps } from "./Model/IPDFGenProps";
+import { IPDFGenProps } from "../Model/IPDFGenProps";
 
 const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
     const [modelState, setModelState] = useState<IPDFGenProps>({
