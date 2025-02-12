@@ -152,7 +152,7 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
     );
 
     const getEmailTemplates = async (): Promise<IEmailTemplate[]> => {
-        return fetch('/api/data/v9.2/templates?$select=safehtml,title,description&$filter=(templateid%20eq%20%27af776cb6-c1e7-ef11-9342-6045bd022000%27)')
+        return fetch('/api/data/v9.2/templates?$select=safehtml,title,description')
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = response.json();
