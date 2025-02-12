@@ -1,6 +1,6 @@
 export interface IPDFGenProps {
     recordId: string;
-    emailTemplates: string[];
+    emailTemplates: IEmailTemplate[];
     isOpen: boolean;
     onChange: (value: string) => void;
 }

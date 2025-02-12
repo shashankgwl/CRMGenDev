@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDF_Generator", "PDF_Generator.csproj", "{B6188778-49C8-5EB7-3379-44C03D8F8E11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRMTest", "..\CommandLineTest\CRMTest\CRMTest.csproj", "{D26B517A-5167-43DC-8B05-8312367CB59E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6188778-49C8-5EB7-3379-44C03D8F8E11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6188778-49C8-5EB7-3379-44C03D8F8E11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6188778-49C8-5EB7-3379-44C03D8F8E11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6188778-49C8-5EB7-3379-44C03D8F8E11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D26B517A-5167-43DC-8B05-8312367CB59E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D26B517A-5167-43DC-8B05-8312367CB59E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D26B517A-5167-43DC-8B05-8312367CB59E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D26B517A-5167-43DC-8B05-8312367CB59E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6FEB0C5B-0FDF-4683-B487-7343E8BDCB59}
+	EndGlobalSection
+EndGlobal

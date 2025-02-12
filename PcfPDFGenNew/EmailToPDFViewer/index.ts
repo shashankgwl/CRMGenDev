@@ -31,7 +31,10 @@ export class EmailToPDFViewer implements ComponentFramework.ReactControl<IInputs
 
         const props: IPDFGenProps = {
             recordId: formContext.page.entityId || '',
-            emailTemplates: ["template1.xml", "template2.xml"],
+            emailTemplates: [{
+                templateId: '1', safeHTML: '<h1>Test</h1>', title: 'Test',
+                description: null
+            }], // Dummy data
             isOpen: this.hasValidAttributeValue(currentValue),
             onChange: (value: string) => {
                 this.currentValue = value;
