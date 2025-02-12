@@ -1,5 +1,5 @@
 import { IInputs, IOutputs } from "./generated/ManifestTypes";
-import { EmailTemplateToPDF } from "./PDFGen";
+import { EmailTemplateToPDF } from "./TSX/PDFGen";
 import { IPDFGenProps } from "./Model/IPDFGenProps";
 import * as React from "react";
 
