@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import html2pdf from 'html2pdf.js';
 
-import { getTheme, Modal, IconButton, IIconProps, FontWeights, IButtonStyles, Stack, List, Icon, getRTL, ITheme, mergeStyleSets, getFocusStyle } from "@fluentui/react";
+import { getTheme, Modal, IconButton, IIconProps, FontWeights, IButtonStyles, Stack, List, Icon, ITheme, mergeStyleSets, getFocusStyle } from "@fluentui/react";
 import { IPDFGenProps } from "../Model/IPDFGenProps";
 
 const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
@@ -125,6 +125,8 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
             setModelState({ ...modelState, isOpen: props.isOpen });
         }
     }, [props.isOpen]);
+
+    
     const onRenderCell = React.useCallback(
         (item?: IEmailTemplate, index?: number | undefined, isScrolling?: boolean): React.ReactNode => {
             if (!item) {
@@ -132,12 +134,17 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
             }
             return (
                 <div className={classNames.itemCell} data-is-focusable={true}>
-
                     <div className={classNames.itemContent}>
                         <div className={classNames.itemName}>{item.title}</div>
                         <div>{item.description}</div>
                     </div>
-                    <Icon className={classNames.chevron} iconName={getRTL() ? 'ChevronLeft' : 'ChevronRight'} onClick={async () => await convertHtmlToPDF(item.safehtml)} />
+                    <IconButton
+                        iconProps={{ iconName: "Download" }}
+                        title="Download"
+                        ariaLabel="Download"
+                        onClick={async () => await convertHtmlToPDF(item.safehtml)}
+                        styles={{ root: { marginLeft: 'auto' } }}
+                    />
                 </div>
             );
         },
@@ -145,7 +152,7 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
     );
 
     const getEmailTemplates = async (): Promise<IEmailTemplate[]> => {
-        return fetch('/api/data/v9.2/templates?$select=safehtml,title,description&$filter=(templateid%20eq%20%27af776cb6-c1e7-ef11-9342-6045bd022000%27)')
+        return fetch('/api/data/v9.2/templates?$select=safehtml,title,description')
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = response.json();
