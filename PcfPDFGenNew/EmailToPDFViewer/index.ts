@@ -39,7 +39,9 @@ export class EmailToPDFViewer implements ComponentFramework.ReactControl<IInputs
             onChange: (value: string) => {
                 this.currentValue = value;
                 this.notifyOutputChanged();
-            }
+            },
+
+            pcfContext: context
         };
 
         return React.createElement(EmailTemplateToPDF, props);
