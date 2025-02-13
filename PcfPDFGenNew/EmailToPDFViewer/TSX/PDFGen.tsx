@@ -6,10 +6,11 @@ import { IPDFGenProps } from "../Model/IPDFGenProps";
 
 const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
     const [modelState, setModelState] = useState<IPDFGenProps>({
-        recordId: '',
+        recordId: props.recordId,
         emailTemplates: [],
         isOpen: props.isOpen,
-        onChange: props.onChange
+        onChange: props.onChange,
+        pcfContext: props.pcfContext
     });
 
     const theme = getTheme();
@@ -88,10 +89,72 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
         modelState.onChange('');
     };
 
+    const fetchAttributes = async (attributes : string,entityName : string,fieldSlugs : string[], html : string): Promise<string> => {
+        const query = `/api/data/v9.2/${entityName}(${modelState.recordId})?$select=${attributes}`;
+        const response = await fetch(query);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        const slugValueMapping: { [key: string]: string } = {};
+        fieldSlugs.forEach((slug: string) => {
+            const [, field] = slug.replace('{', '').replace('}', '').split('.');
+            slugValueMapping[slug] = data[field];
+        });
+
+        //let tempHtml = ''
+
+        Object.keys(slugValueMapping).forEach((slug) => {
+            const value = slugValueMapping[slug];
+            html = html?.replace(new RegExp(slug, 'g'), value)??'';
+        });
+
+        return html??'';
+    };
+
+    const parseHTML = async (html: string | null): Promise<string> => {
+        let entityName: string = '';
+        const regex = /{(\w+\.\w+)}/g;
+        const slugs = [];
+        const relationShipSlugs: string[] = [];
+        const fieldSlugs: string[] = [];
+        let match;
+        while ((match = regex.exec(html ?? '')) !== null) {
+            slugs.push(match[0]);
+        }
+
+        slugs.forEach((slug) => {  // divide the slugs into fields and relationships.
+            const [entity, field] = slug.replace('{', '').replace('}', '').split('.');
+            if (slug.indexOf('_') > -1) { // This is a relationship
+                relationShipSlugs.push(slug);
+            }
+            else {
+                entityName = entity;
+                fieldSlugs.push(slug); // This is a field
+            }
+        });
+
+        let attributes = ''
+
+        fieldSlugs.forEach((field) => {
+           const [a,b] = field.replace('{', '').replace('}', '').split('.');
+           b && (attributes += b + ','); // Add the field to the attributes
+        });
+        attributes = attributes.replace(/,$/, ''); // Remove trailing comma
+
+        const tempHtml = await fetchAttributes(attributes, entityName, fieldSlugs, html ?? ''); // Fetch the attributes and replace the slugs with the values
+
+        
+        return tempHtml;
+
+        //return '';
+    }
+
     const convertHtmlToPDF = async (html: string | null): Promise<void> => {
         try {
+
+            const htmlParsed = await parseHTML(html);
+
             const pdf = await html2pdf()
-                .from(html)
+                .from(htmlParsed)
                 .set({
                     margin: 1,
                     filename: 'document.pdf',
@@ -125,7 +188,7 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
         }
     }, [props.isOpen]);
 
-    
+
     const onRenderCell = React.useCallback(
         (item?: IEmailTemplate, _index?: number | undefined): React.ReactNode => {
             if (!item) {
