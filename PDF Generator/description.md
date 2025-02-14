@@ -1,181 +1,128 @@
-# Technical Design Document for `PDFGen.tsx`
+0 notifications total
 
-## Overview
-The `PDFGen.tsx` file is a React functional component that generates a PDF from email templates. This component uses various libraries and Fluent UI components to interact with and display data, manage modal state, and convert HTML content to PDF.
+Skip to search
 
-## Components and Libraries
-- **React**: Utilized for building the user interface.
-- **html2pdf.js**: Library for converting HTML content to PDF.
-- **Fluent UI**: Used for styling and UI components such as Modal, IconButton, Stack, and List.
+Skip to main content
 
-## Props
-The component `EmailTemplateToPDF` accepts the following props:
-- `recordId`: The identifier for the record.
-- `emailTemplates`: Array of email templates.
-- `isOpen`: Boolean indicating if the modal is open.
-- `onChange`: Function to handle changes.
-- `pcfContext`: Context passed from the PCF control.
+Keyboard shortcuts
+Close jump menu
+Search
+new feed updates notifications
+Home
+My Network
+Jobs
+Messaging
+Notifications
+Shashank Bhide
+Me
 
-## State
-The component manages its internal state using the `useState` hook:
-- `modelState`: An object containing:
-  - `recordId`
-  - `emailTemplates`
-  - `isOpen`
-  - `onChange`
-  - `pcfContext`
+For Business
+Reactivate Premium: 50% Off
 
-## Styles
-The component leverages Fluent UI's theming capabilities to style its elements:
-- `modalStyles`: Custom styles for the modal.
-- `generateStyles`: A function that generates styles based on the current theme.
-- `iconButtonStyles`: Custom styles for the icon button.
 
-## Functions
+Shashank Bhide
+Individual article
+Style
 
-### hideModal
-This function closes the modal and triggers the `onChange` prop with an empty string.
 
-```javascript
-const hideModal = () => {
-    setModelState({ ...modelState, isOpen: false });
-    modelState.onChange('');
-};
-```
 
-### fetchAttributes
-This asynchronous function fetches data attributes from an API and processes them to replace placeholders in the provided HTML content.
 
-```javascript
-const fetchAttributes = async (attributes, entityName, fieldSlugs, relationObj, html) => {
-    // function logic
-};
-```
 
-### parseHTML
-This function parses the provided HTML content, identifies placeholders, and fetches the corresponding data to replace these placeholders.
 
-```javascript
-const parseHTML = async (html) => {
-    // function logic
-};
-```
 
-### convertHtmlToPDF
-This function converts the provided HTML content to a PDF using the `html2pdf.js` library.
 
-```javascript
-const convertHtmlToPDF = async (html) => {
-    // function logic
-};
-```
 
-### getEmailTemplates
-This function fetches email templates from an API.
 
-```javascript
-const getEmailTemplates = async () => {
-    return fetch('/api/data/v9.2/templates?$select=safehtml,title,description')
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            const data = response.json();
-            console.log(data);
-            return data;
-        })
-        .then(data => data.value ?? []) // Ensure it returns an array
-        .catch(error => {
-            console.error("Failed to fetch email templates:", error);
-            return [];
-        });
-};
-```
+Manage
 
-### onRenderCell
-This function renders a cell for each email template in the list.
+Update
 
-```javascript
-const onRenderCell = React.useCallback(
-    (item, _index) => {
-        if (!item) {
-            return null;
-        }
-        return (
-            <div className={classNames.itemCell} data-is-focusable={true}>
-                <div className={classNames.itemContent}>
-                    <div className={classNames.itemName}>{item.title}</div>
-                    <div>{item.description}</div>
-                </div>
-                <IconButton
-                    iconProps={{ iconName: "Download" }}
-                    title="Download"
-                    ariaLabel="Download"
-                    onClick={async () => await convertHtmlToPDF(item.safehtml)}
-                    styles={{ root: { marginLeft: 'auto' } }}
-                />
-            </div>
-        );
-    },
-    [classNames],
-);
-```
 
-## useEffect Hook
-The `useEffect` hook is used to fetch email templates when the modal is opened and update the component state.
+Article cover image
+Image courtesy Internet
+Title
+Generate PDF documents from Dataverse email templates no extra license required.
+The requirements in my mind for PDF generation were absolutely clear and as listed below.
 
-```javascript
-useEffect(() => {
-    if (props.isOpen) {
-        setModelState({ ...modelState, isOpen: props.isOpen });
-        getEmailTemplates()
-            .then((templates) => {
-                setModelState((prevState) => ({ ...prevState, emailTemplates: templates }));
-                return templates;
-            })
-            .catch((error) => {
-                console.error("Failed to fetch email templates:", error);
-                throw error;
-            });
-    } else {
-        setModelState({ ...modelState, isOpen: props.isOpen });
-    }
-}, [props.isOpen]);
-```
+No additional licenses (third party or PP) should be required.
 
-## JSX Structure
-The component renders a Fluent UI Modal containing a list of email templates. Each template can be converted to a PDF by clicking the download button.
+No complex integration should be needed, e.g. create a complicated function app, then create an unnecessary connector and do a 3 layer data exchange and lot of datatype conversion at each layer.
 
-```javascript
-return (
-    <Modal
-        isOpen={modelState.isOpen}
-        onDismiss={hideModal}
-        isBlocking={true}
-        styles={modalStyles}
-    >
-        <Stack horizontalAlign="space-between">
-            <Stack horizontalAlign="end" verticalAlign="start">
-                <IconButton
-                    styles={iconButtonStyles}
-                    iconProps={cancelIcon}
-                    ariaLabel="Close popup modal"
-                    onClick={hideModal}
-                />
-            </Stack>
-            <Stack horizontalAlign="start">
-                <span style={{ fontWeight: FontWeights.semibold }}>Email Templates</span>
-            </Stack>
-            <Stack>
-                <div>
-                    <List
-                        items={modelState.emailTemplates}
-                        onRenderCell={onRenderCell}
-                    />
-                </div>
-            </Stack>
-        </Stack>
-    </Modal>
-);
-```
+Based on the above requirements, it became clearer that I needed an in-house server side worker (plugin or workflow or power automate) and then invoke it from the model driven app.
 
-## Conclusion
-The `PDFGen.tsx` component is a well-structured React component that leverages various libraries and Fluent UI components to provide a seamless user experience for converting email templates into PDFs. The component handles data fetching, state management, and PDF generation efficiently, ensuring a smooth and responsive interface.
+To my surprise, the C# ecosystem lacks robust solutions (open source) for generating PDFs directly from HTML. The most popular library relies on external executables or DLLs for the conversion. And as we all know that in a Dataverse environment, executing such external files is almost certainly blocked by the framework, posing a significant challenge.
+
+That's when I stumbled upon the html2Pdf.js client side library and decided to give it a try. The output PDF quality was better than my expectations. A little more tinkering with the PDF properties will definitely produce amazing PDF with more control
+
+In my previous article, we saw a PCF control for a modal popup which could be launched from a command bar.
+
+In this article we'll use the modal surface to show the email templates in a fluent UI List and a download button to download the PDF. 
+
+You can see the video here.
+
+How to configure
+Create an email template.
+
+
+
+Minimize image
+Edit image
+Delete image
+
+
+Set repeater table header as shown below. Select the table and right click on it, and select table properties. (THIS SETP IS A MUST).
+
+
+
+Minimize image
+Edit image
+Delete image
+
+
+
+
+Minimize image
+Edit image
+Delete image
+
+
+Download the code or solution from the repository.
+
+Import the solution. Publish customizations.
+
+Create an attribute and bind it to the PCF control.
+
+Create a command bar button and set the bound attribute's value to "1" as shown in the previous article.
+
+
+
+Click the command bar to open the list of email templates.
+
+Minimize image
+Edit image
+Delete image
+
+
+Click on download icon to convert the HTML to PDF.
+
+
+
+Minimize image
+Edit image
+Delete image
+
+
+
+
+Current limitations
+Only one repeater table is supported.
+
+Lookups not supported yet.
+
+Repeater table must have a header set through table settings.
+
+
+
+
+
+Draft - saved
