@@ -1,68 +1,79 @@
-Detailed Technical Design Document for PDFGen.tsx
-Overview
-The PDFGen.tsx file is a React functional component that generates a PDF from email templates. This component uses various libraries and Fluent UI components to interact with and display data, manage modal state, and convert HTML content to PDF.
+# Technical Design Document for `PDFGen.tsx`
 
-Components and Libraries
-React: Utilized for building the user interface.
-html2pdf.js: Library for converting HTML content to PDF.
-Fluent UI: Used for styling and UI components such as Modal, IconButton, Stack, and List.
-Props
-The component EmailTemplateToPDF accepts the following props:
+## Overview
+The `PDFGen.tsx` file is a React functional component that generates a PDF from email templates. This component uses various libraries and Fluent UI components to interact with and display data, manage modal state, and convert HTML content to PDF.
 
-recordId: The identifier for the record.
-emailTemplates: Array of email templates.
-isOpen: Boolean indicating if the modal is open.
-onChange: Function to handle changes.
-pcfContext: Context passed from the PCF control.
-State
-The component manages its internal state using the useState hook:
+## Components and Libraries
+- **React**: Utilized for building the user interface.
+- **html2pdf.js**: Library for converting HTML content to PDF.
+- **Fluent UI**: Used for styling and UI components such as Modal, IconButton, Stack, and List.
 
-modelState: An object containing:
-recordId
-emailTemplates
-isOpen
-onChange
-pcfContext
-Styles
+## Props
+The component `EmailTemplateToPDF` accepts the following props:
+- `recordId`: The identifier for the record.
+- `emailTemplates`: Array of email templates.
+- `isOpen`: Boolean indicating if the modal is open.
+- `onChange`: Function to handle changes.
+- `pcfContext`: Context passed from the PCF control.
+
+## State
+The component manages its internal state using the `useState` hook:
+- `modelState`: An object containing:
+  - `recordId`
+  - `emailTemplates`
+  - `isOpen`
+  - `onChange`
+  - `pcfContext`
+
+## Styles
 The component leverages Fluent UI's theming capabilities to style its elements:
+- `modalStyles`: Custom styles for the modal.
+- `generateStyles`: A function that generates styles based on the current theme.
+- `iconButtonStyles`: Custom styles for the icon button.
 
-modalStyles: Custom styles for the modal.
-generateStyles: A function that generates styles based on the current theme.
-iconButtonStyles: Custom styles for the icon button.
-Functions
-hideModal
-This function closes the modal and triggers the onChange prop with an empty string.
+## Functions
 
-JavaScript
+### hideModal
+This function closes the modal and triggers the `onChange` prop with an empty string.
+
+```javascript
 const hideModal = () => {
     setModelState({ ...modelState, isOpen: false });
     modelState.onChange('');
 };
-fetchAttributes
+```
+
+### fetchAttributes
 This asynchronous function fetches data attributes from an API and processes them to replace placeholders in the provided HTML content.
 
-JavaScript
+```javascript
 const fetchAttributes = async (attributes, entityName, fieldSlugs, relationObj, html) => {
     // function logic
 };
-parseHTML
+```
+
+### parseHTML
 This function parses the provided HTML content, identifies placeholders, and fetches the corresponding data to replace these placeholders.
 
-JavaScript
+```javascript
 const parseHTML = async (html) => {
     // function logic
 };
-convertHtmlToPDF
-This function converts the provided HTML content to a PDF using the html2pdf.js library.
+```
 
-JavaScript
+### convertHtmlToPDF
+This function converts the provided HTML content to a PDF using the `html2pdf.js` library.
+
+```javascript
 const convertHtmlToPDF = async (html) => {
     // function logic
 };
-getEmailTemplates
+```
+
+### getEmailTemplates
 This function fetches email templates from an API.
 
-JavaScript
+```javascript
 const getEmailTemplates = async () => {
     return fetch('/api/data/v9.2/templates?$select=safehtml,title,description')
         .then(response => {
@@ -77,10 +88,12 @@ const getEmailTemplates = async () => {
             return [];
         });
 };
-onRenderCell
+```
+
+### onRenderCell
 This function renders a cell for each email template in the list.
 
-JavaScript
+```javascript
 const onRenderCell = React.useCallback(
     (item, _index) => {
         if (!item) {
@@ -104,10 +117,12 @@ const onRenderCell = React.useCallback(
     },
     [classNames],
 );
-useEffect Hook
-The useEffect hook is used to fetch email templates when the modal is opened and update the component state.
+```
 
-JavaScript
+## useEffect Hook
+The `useEffect` hook is used to fetch email templates when the modal is opened and update the component state.
+
+```javascript
 useEffect(() => {
     if (props.isOpen) {
         setModelState({ ...modelState, isOpen: props.isOpen });
@@ -124,10 +139,12 @@ useEffect(() => {
         setModelState({ ...modelState, isOpen: props.isOpen });
     }
 }, [props.isOpen]);
-JSX Structure
+```
+
+## JSX Structure
 The component renders a Fluent UI Modal containing a list of email templates. Each template can be converted to a PDF by clicking the download button.
 
-JavaScript
+```javascript
 return (
     <Modal
         isOpen={modelState.isOpen}
@@ -158,5 +175,7 @@ return (
         </Stack>
     </Modal>
 );
-Conclusion
-The PDFGen.tsx component is a well-structured React component that leverages various libraries and Fluent UI components to provide a seamless user experience for converting email templates into PDFs. The component handles data fetching, state management, and PDF generation efficiently, ensuring a smooth and responsive interface.
+```
+
+## Conclusion
+The `PDFGen.tsx` component is a well-structured React component that leverages various libraries and Fluent UI components to provide a seamless user experience for converting email templates into PDFs. The component handles data fetching, state management, and PDF generation efficiently, ensuring a smooth and responsive interface.
