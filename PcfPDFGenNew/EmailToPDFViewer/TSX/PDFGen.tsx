@@ -89,25 +89,64 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
         modelState.onChange('');
     };
 
-    const fetchAttributes = async (attributes : string,entityName : string,fieldSlugs : string[], html : string): Promise<string> => {
+    const fetchAttributes = async (attributes: string, entityName: string, fieldSlugs: string[], relationObj: nameQueryPair, html: string): Promise<string> => {
         const query = `/api/data/v9.2/${entityName}(${modelState.recordId})?$select=${attributes}`;
-        const response = await fetch(query);
+
+        const finalQuery = query + relationObj.query;
+        const response = await fetch(finalQuery);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
+
         const slugValueMapping: { [key: string]: string } = {};
         fieldSlugs.forEach((slug: string) => {
             const [, field] = slug.replace('{', '').replace('}', '').split('.');
             slugValueMapping[slug] = data[field];
         });
 
-        //let tempHtml = ''
+        const nameOfRelation = relationObj.relationShipSlugs[0].relationShipName;   // Get the name of the relationship
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html ?? '', 'text/html');
+        let tbody = doc.querySelectorAll('table tbody')[0];
+        const td = tbody.querySelectorAll('td')[0];
+        data[nameOfRelation].forEach((item: { [x: string]: any; }) => {
+            const tr = document.createElement('tr');
+            relationObj.relationShipSlugs.forEach((slug: ISlugDefinition) => {
+                const newTD = td.cloneNode(true);
+                const textContent = newTD.textContent ?? '';
+                (newTD as HTMLElement).innerHTML = (newTD as HTMLElement).innerHTML.replace(textContent, item[slug.fieldName]);   // Replace the content of the td with the value of the field
+                tr.appendChild(newTD);
+                tbody.appendChild(tr);
+            })
+        });
+
+        const table = doc.querySelector('table');
+        if (table) {
+            const existingTbody = table.querySelector('tbody');
+            if (existingTbody) {
+                table.replaceChild(tbody, existingTbody);
+            } else {
+                table.appendChild(tbody);
+            }
+        }
+        const firstTr = tbody.querySelector('tr');
+        if (firstTr) {
+            tbody = tbody.removeChild(firstTr);
+        }
+
+        html = doc.documentElement.outerHTML;
+
+        // relationObj.relationShipSlugs.forEach((slug: string) => {
+        //     const [, field] = slug.replace('{', '').replace('}', '').split('.');
+        //     slugValueMappingRelationship[slug] = data[relationObj.name].map((item: { [x: string]: any; })=>item[field])
+        // });
 
         Object.keys(slugValueMapping).forEach((slug) => {
             const value = slugValueMapping[slug];
-            html = html?.replace(new RegExp(slug, 'g'), value)??'';
+            html = html?.replace(new RegExp(slug, 'g'), value) ?? '';
         });
 
-        return html??'';
+
+        return html ?? '';
     };
 
     const parseHTML = async (html: string | null): Promise<string> => {
@@ -133,16 +172,38 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
         });
 
         let attributes = ''
+        let relationships = ''
 
         fieldSlugs.forEach((field) => {
-           const [a,b] = field.replace('{', '').replace('}', '').split('.');
-           b && (attributes += b + ','); // Add the field to the attributes
+            const [a, b] = field.replace('{', '').replace('}', '').split('.');
+            b && (attributes += b + ','); // Add the field to the attributes
         });
+
+        relationShipSlugs.forEach((relationship) => {
+            const [a, b] = relationship.replace('{', '').replace('}', '').split('.');
+            b && (relationships += b + ','); // Add the relationship to the relationships
+        });
+
+
         attributes = attributes.replace(/,$/, ''); // Remove trailing comma
+        relationships = relationships.replace(/,$/, ''); // Remove trailing comma
+        const relationShipName = relationShipSlugs[0].replace('{', '').replace('}', '').split('.')[0]; // Get the relationship name
 
-        const tempHtml = await fetchAttributes(attributes, entityName, fieldSlugs, html ?? ''); // Fetch the attributes and replace the slugs with the values
+        const expandQuery = relationships ? `&$expand=${relationShipName}($select=${relationships})` : '';  // If there are relationships, add the expand query
 
-        
+        const slugDefinitions: ISlugDefinition[] = [];    // Define the slug definitions
+
+        relationShipSlugs.forEach((slug) => {
+            const [entity, field] = slug.replace('{', '').replace('}', '').split('.');
+            slugDefinitions.push({ relationShipName: entity, fieldName: field });
+        });
+
+        const nameQueryPair: nameQueryPair = { query: expandQuery, name: relationShipName, relationShipSlugs: slugDefinitions };
+
+
+        const tempHtml = await fetchAttributes(attributes, entityName, fieldSlugs, nameQueryPair, html ?? ''); // Fetch the attributes and replace the slugs with the values
+
+
         return tempHtml;
 
         //return '';
