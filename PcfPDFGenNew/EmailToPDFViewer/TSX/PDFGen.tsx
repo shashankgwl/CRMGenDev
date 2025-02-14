@@ -89,7 +89,7 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
         modelState.onChange('');
     };
 
-    const fetchAttributes = async (attributes: string, entityName: string, fieldSlugs: string[], relationObj: nameQueryPair, html: string): Promise<string> => {
+    const fetchAttributes = async (attributes: string, entityName: string, fieldSlugs: string[], relationObj: INameQueryPair, html: string): Promise<string> => {
         const query = `/api/data/v9.2/${entityName}(${modelState.recordId})?$select=${attributes}`;
 
         const finalQuery = query + relationObj.query;
@@ -193,7 +193,7 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
             slugDefinitions.push({ relationShipName: entity, fieldName: field });
         });
 
-        const nameQueryPair: nameQueryPair = { query: expandQuery, name: relationShipName, relationShipSlugs: slugDefinitions };
+        const nameQueryPair: INameQueryPair = { query: expandQuery, name: relationShipName, relationShipSlugs: slugDefinitions };
 
 
         const tempHtml = await fetchAttributes(attributes, entityName, fieldSlugs, nameQueryPair, html ?? ''); // Fetch the attributes and replace the slugs with the values

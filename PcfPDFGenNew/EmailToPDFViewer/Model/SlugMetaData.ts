@@ -4,7 +4,7 @@ interface ISlugDefinition {
 }
 
 
-interface nameQueryPair {
+interface INameQueryPair {
     query: string,
     name: string,
     relationShipSlugs: ISlugDefinition[] 
