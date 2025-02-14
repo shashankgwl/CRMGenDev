@@ -107,10 +107,13 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html ?? '', 'text/html');
         let tbody = doc.querySelectorAll('table tbody')[0];
-        const td = tbody.querySelectorAll('td')[0];
+        let tdCounter = 0;
         data[nameOfRelation].forEach((item: { [x: string]: any; }) => {
+
             const tr = document.createElement('tr');
             relationObj.relationShipSlugs.forEach((slug: ISlugDefinition) => {
+                const td = tbody.querySelectorAll('td')[tdCounter];
+                tdCounter++;
                 const newTD = td.cloneNode(true);
                 const textContent = newTD.textContent ?? '';
                 (newTD as HTMLElement).innerHTML = (newTD as HTMLElement).innerHTML.replace(textContent, item[slug.fieldName]);   // Replace the content of the td with the value of the field
