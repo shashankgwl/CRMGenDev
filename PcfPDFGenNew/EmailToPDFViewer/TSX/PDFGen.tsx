@@ -135,11 +135,6 @@ const EmailTemplateToPDF: React.FC<IPDFGenProps> = (props) => {
 
         html = doc.documentElement.outerHTML;
 
-        // relationObj.relationShipSlugs.forEach((slug: string) => {
-        //     const [, field] = slug.replace('{', '').replace('}', '').split('.');
-        //     slugValueMappingRelationship[slug] = data[relationObj.name].map((item: { [x: string]: any; })=>item[field])
-        // });
-
         Object.keys(slugValueMapping).forEach((slug) => {
             const value = slugValueMapping[slug];
             html = html?.replace(new RegExp(slug, 'g'), value) ?? '';
