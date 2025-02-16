@@ -1,5 +1,5 @@
 interface ISlugDefinition {
-    relationShipName: string;
+    entityOrRelationShipName: string;
     fieldName: string;
 }
 
