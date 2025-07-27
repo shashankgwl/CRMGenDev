@@ -1,0 +1,49 @@
+swagger: '2.0'
+info:
+  title: Populate Word Template(Shashank)
+  description: Azure Function to populate Word content controls from a template and JSON
+  version: 1.0.0
+host: durablecrm.azurewebsites.net
+basePath: /api
+schemes:
+  - https
+consumes:
+  - multipart/form-data
+produces:
+  - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+paths:
+  /PopulateWordTemplate:
+    post:
+      summary: Populate A Word Template (Shashank)
+      operationId: PopulateWordTemplate
+      consumes:
+        - multipart/form-data
+      produces:
+        - >-
+          application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      parameters:
+        - name: template
+          in: formData
+          description: The .docx Word template file
+          required: true
+          type: file
+        - name: data
+          in: formData
+          description: JSON string with values and arrays for repeaters
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Word document
+          schema:
+            type: file
+        default:
+          description: Error
+      description: Populates a word template file with JSON data and creates a word file.
+securityDefinitions:
+  api_key:
+    type: apiKey
+    in: query
+    name: code
+security:
+  - api_key: []
