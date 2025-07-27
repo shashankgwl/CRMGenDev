@@ -59,7 +59,8 @@ There are two types of placeholders your Word template can support:
 3. **Select the entire row and add a repeater control**
 4. See the image below.
 
-   <img width="1344" height="744" alt="image" src="https://github.com/user-attachments/assets/a6f6a0bf-2006-4ce8-b14c-418024a128a9" />
+   <img width="1261" height="731" alt="image" src="https://github.com/user-attachments/assets/1c2be635-530f-4195-b721-2d9d3f8df13e" />
+
 
 
 
