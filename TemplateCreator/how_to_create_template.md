@@ -55,10 +55,13 @@ There are two types of placeholders your Word template can support:
 #### 🔁 For Repeating Table Rows (Repeaters)
 
 1. Insert a table with one row (for header) and another row (for dynamic content).
-2. Select the **entire row** you want to repeat.
-3. Click **Developer** → **Repeating Section Content Control**.
-4. Inside each cell, insert a **Plain Text Content Control**.
-5. Set the **Tag** for each cell to match JSON field names inside your array.
+2. Put individual "Plain text" controls for each column first.
+3. **Select the entire row and add a repeater control**
+4. See the image below.
+
+   <img width="1344" height="744" alt="image" src="https://github.com/user-attachments/assets/a6f6a0bf-2006-4ce8-b14c-418024a128a9" />
+
+
 
 ##### Example Tags for Contacts Table
 
