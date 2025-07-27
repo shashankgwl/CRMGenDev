@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "TemplateCreator": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7287",
+      "launchBrowser": false
+    }
+  }
+}
