@@ -49,6 +49,9 @@ There are two types of placeholders your Word template can support:
 4. Set the **Tag** to the JSON field name (e.g., `name`, `accountnumber`).
 
 > 💡 Only the **Tag** field is used — the Title or Display Name can be anything.
+> See image below.
+> <img width="1418" height="709" alt="image" src="https://github.com/user-attachments/assets/991a2356-a3ad-4332-93be-a691dd48557d" />
+
 
 ---
 
@@ -100,4 +103,14 @@ The connector will replace controls based on the `tag` field, using the followin
     }
   ]
 }
+```
+
+#Important points to remember
+
+1. **The "tag" for non array attributes must match with the JSON nodes, e.g. in the payload above "name" is a JSON node and there is a content control also on the word template with tag as "name" (see step 2)** 
+2. **The tag for repeater must match with the name of the array** see image below
+
+<img width="1206" height="508" alt="image" src="https://github.com/user-attachments/assets/fd088189-cc1b-4292-a182-37474d68f1e1" />
+
+
 
