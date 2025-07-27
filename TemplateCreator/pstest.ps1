@@ -1,5 +1,5 @@
 $Uri = "http://localhost:7071/api/PopulateWordTemplate"
-$filePath = ".\tmpl.docx"
+$filePath = ".\template.docx"
 $data = @{
     name              = "John Doe"
     accountnumber     = "123456789"

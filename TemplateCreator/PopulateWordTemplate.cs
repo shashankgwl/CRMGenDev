@@ -19,7 +19,7 @@ public class PopulateWordTemplate
     }
 
     [Function("PopulateWordTemplate")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
     {
         // We will get the word template as binary data and then use OpenXML to manipulate it.
         if (!req.HasFormContentType)
@@ -50,7 +50,7 @@ public class PopulateWordTemplate
 
             var finalStream = ReplaceContentControls(file, data);
             finalStream.Position = 0;
-            File.WriteAllBytes("C:\\Users\\ShashankBhide\\temp1.docx", finalStream.ToArray());
+            //File.WriteAllBytes("C:\\Users\\ShashankBhide\\temp1.docx", finalStream.ToArray());
             // Return the modified document as a file
             return new FileStreamResult(finalStream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
             {
