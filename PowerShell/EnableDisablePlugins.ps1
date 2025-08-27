@@ -1,4 +1,3 @@
-#Requires -Version 5.1
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [Parameter(Mandatory = $true)]
@@ -15,7 +14,7 @@ param(
     [string]$RedirectUri = 'app://58145B91-0C36-4500-8554-080854F2AC97'
 )
 
-# --- Module checks ---
+
 $missing = @()
 if (-not (Get-Module -ListAvailable -Name Microsoft.Xrm.Tooling.CrmConnector.PowerShell)) { $missing += 'Microsoft.Xrm.Tooling.CrmConnector.PowerShell' }
 if (-not (Get-Module -ListAvailable -Name Microsoft.Xrm.Data.Powershell))            { $missing += 'Microsoft.Xrm.Data.Powershell' }
@@ -29,7 +28,7 @@ if ($missing.Count -gt 0) {
 Import-Module Microsoft.Xrm.Tooling.CrmConnector.PowerShell -ErrorAction Stop
 Import-Module Microsoft.Xrm.Data.Powershell            -ErrorAction Stop
 
-# --- Connect using XRM Tooling (OAuth connection string) ---
+# --- Connect with XRM Tooling (OAuth connection string) ---
 try {
     $url = $EnvironmentUrl.TrimEnd('/')
 
@@ -174,3 +173,4 @@ catch {
 finally {
     if ($conn -is [System.IDisposable]) { $conn.Dispose() }
 }
+
