@@ -1,4 +1,5 @@
 # EnableDisablePlugins.ps1 — Easy Explanation
+
 https://github.com/shashankgwl/CRMGenDev/blob/main/PowerShell/EnableDisablePlugins.ps1
 This PowerShell script is used to **enable or disable plug-in steps** for a specified solution in Microsoft Dataverse/CRM (Dynamics 365).  
 It connects to your CRM environment, finds all plug-in steps in a given solution, and sets their status to "Enabled" or "Disabled".
