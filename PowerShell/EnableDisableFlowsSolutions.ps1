@@ -1,7 +1,7 @@
 # first we'll get all the flows in the environment
-$EnvironmentId = '79f0289f-86b7-e9d5-99e1-8d5d5ab6b8ae'
-$SolutionId = 'b0e17071-a801-4ed9-bf69-d171fea20138'
-$url = 'CRM URL' # e.g. https://org.crm.dynamics.com
+$EnvironmentId = '43cecd50-6cdb-e953-9bba-be5d46e31aa5'
+$SolutionId = '174b6e43-9c30-4291-88fd-a1cbbf24d1dd'
+$url = 'https://YOURCRM.crm11.dynamics.com/'
 $EnableOrDisable = 'Enable' # or 'Disable'
 $allFlows = Get-AdminFlow -EnvironmentName $EnvironmentId
 # Optional: use your own Entra app values in production
