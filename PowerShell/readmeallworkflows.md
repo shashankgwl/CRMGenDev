@@ -1,4 +1,5 @@
 # PowerShell Script: Enable or Disable Workflows in Dataverse Solution
+https://github.com/shashankgwl/CRMGenDev/blob/main/PowerShell/EnableDisableAllWorkflows.ps1
 
 This PowerShell script automates the enabling or disabling of various workflow types within a specified Microsoft Dataverse solution. It supports the following workflow categories:
 
