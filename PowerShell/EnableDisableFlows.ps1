@@ -7,7 +7,7 @@ $Action = 'On'   # 'On' or 'Off'
 # ── Sign in interactively ───────────────────────────────────────────────────
 Import-Module Microsoft.PowerApps.Administration.PowerShell
 Add-PowerAppsAccount -Endpoint "PROD" | Out-Null
-
+#PROVIDE A COMMA SEPARATE LIST OF FLOW NAMES.
 $flowList = @"
 flow1name,
 flow2name,
