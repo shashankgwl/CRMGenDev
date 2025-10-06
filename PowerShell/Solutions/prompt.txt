@@ -1,0 +1,11 @@
+Generate a complete description of tables and their privileges from the data below in pure HTML (<table>, <thead>, <tbody>, <tr>, <th>, <td>) using a per-role matrix:
+Columns: Entity (Table), Create, Read, Write, Delete, Append, Append To, Assign, Share.
+Below each role’s entity matrix, add a second table for non-entity privileges (“Privilege”, “Level”).
+Do not skip any entity. No CSS, no scripts, no notes—just HTML tables.
+If output exceeds the limit, follow the paging protocol.
+
+The contents of the solution.xml files
+{solutionfilexml}
+
+The contents of the customizations.xml files
+{customizationxml}
