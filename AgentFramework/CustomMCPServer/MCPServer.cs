@@ -25,15 +25,29 @@ public class MCPServer
         return res;
     }
 
+    // [Function(nameof(SaveSnippet))]
+    // public string SaveSnippet(
+    //     [McpToolTrigger("SaveSnippetToolName", "SaveSnippetToolDescription")]
+    //         ToolInvocationContext context,
+    //     [McpToolProperty("SnippetNamePropertyName", "string", "SnippetNamePropertyDescription", Required = true)]
+    //         string name,
+    //     [McpToolProperty("SnippetPropertyName", "string", "SnippetPropertyDescription", Required = true)]
+    //         string snippet
+    // )
+    // {
+    //     return snippet;
+    // }
+
     [Function(nameof(SaveDataToBlobStorage))]
     public string SaveDataToBlobStorage([McpToolTrigger("SaveDataToBlob","This tool saves data to blob storage")] ToolInvocationContext context,
         [McpToolProperty("data", "string", "Data to be saved in blob in base64 format", Required = true)] string data,
         [McpToolProperty("containername", "string", "this is the blob container where the data is stored", Required = true)] string containerName,
         [McpToolProperty("blobname", "string", "this is the name of the blob file", Required = false)] string blobname = $"defaultblobpath.txt")
 
-        
+
     {
         // Logic to save data to Blob Storage would go here.
+        _logger.LogInformation($"Data {data} received to be saved in container '{containerName}' with blob name '{blobname}'.");
         return $"Data '{Guid.NewGuid()}.txt' has been saved to Blob Storage.";
     }
 

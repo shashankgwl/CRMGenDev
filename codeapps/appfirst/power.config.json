@@ -1,0 +1,36 @@
+{
+  "appId": "99e5edff-6204-4635-85d1-370a0de25c45",
+  "appDisplayName": "Blob Storage Provider",
+  "description": null,
+  "environmentId": "Default-efe64105-431e-4df2-abda-608a635e081f",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "logoPath": "Default",
+  "localAppUrl": "http://localhost:3000/",
+  "region": "prod",
+  "connectionReferences": {
+    "08e6dd38-4934-4fb0-b031-5c6ba7544187": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_azureblob",
+      "displayName": "Azure Blob Storage",
+      "dataSources": [
+        "azureblob"
+      ],
+      "authenticationType": "keyBasedAuth",
+      "sharedConnectionId": "/providers/Microsoft.PowerApps/apis/shared_azureblob/connections/4836ba4d9a38443cad47e82e7684c12e",
+      "dataSets": {}
+    }
+  },
+  "databaseReferences": {
+    "default.cds": {
+      "databaseDetails": null,
+      "dataSources": {
+        "durablesale": {
+          "entitySetName": "adf_durablesaleses",
+          "logicalName": "adf_durablesales",
+          "isHidden": false
+        }
+      },
+      "actions": null
+    }
+  }
+}
