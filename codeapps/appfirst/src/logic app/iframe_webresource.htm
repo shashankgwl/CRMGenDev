@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Canvas App Launcher</title>
+
+<script>
+
+function getParameterByName(name) {
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var url = window.location.href;
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+    var results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return "";
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+function loadCanvasApp() {
+
+    //Get record GUID passed by Dataverse
+    var recordId = getParameterByName("id");
+
+    if (!recordId) {
+        document.body.innerHTML = "Record ID not found";
+        return;
+    }
+
+    //Remove {}
+    recordId = recordId.replace("{","").replace("}","");
+
+    //Canvas App base URL
+    var baseUrl = "https://apps.powerapps.com/play/e/Default-efe64105-431e-4df2-abda-608a635e081f/a/99e5edff-6204-4635-85d1-370a0de25c45?connections=premium&id=";
+
+    //Final URL
+    var finalUrl = baseUrl + recordId;
+
+    //Load inside iframe
+    document.getElementById("canvasFrame").src = finalUrl;
+}
+
+window.onload = loadCanvasApp;
+
+</script>
+</head>
+
+<body style="margin:0;padding:0">
+
+<iframe 
+    id="canvasFrame"
+    width="100%"
+    height="550px"
+    frameborder="0">
+</iframe>
+
+</body>
+</html>
