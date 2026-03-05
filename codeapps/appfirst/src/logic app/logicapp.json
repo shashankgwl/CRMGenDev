@@ -274,9 +274,6 @@
         }
     },
     "parameters": {
-        "Environment_": {
-            "value": "https://wa-development.crm4.dynamics.com"
-        },
         "TableName_": {
             "value": "contacts"
         },
