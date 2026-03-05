@@ -1,8 +1,24 @@
+:root {
+  --bg: #f3f6fb;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --border: #d8e0ea;
+  --border-strong: #b9c6d8;
+  --text: #1f2937;
+  --text-muted: #5b6472;
+  --primary: #0f4c81;
+  --primary-hover: #0d406d;
+  --danger: #c0282f;
+}
+
 .app-shell {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1.5rem;
-  color: #1f2937;
+  color: var(--text);
+  background: radial-gradient(circle at top right, #ebf4ff 0%, var(--bg) 50%);
+  min-height: fit-content;
+  padding-bottom: 1rem;
 }
 
 h1 {
@@ -18,10 +34,11 @@ h2 {
 }
 
 .header {
-  background: #ffffff;
-  border: 1px solid #d8dde6;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
   padding: 1rem 1.1rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .subtitle {
@@ -31,10 +48,11 @@ h2 {
 }
 
 .panel {
-  background: #ffffff;
-  border: 1px solid #d8dde6;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
   padding: 1rem 1.1rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .section {
@@ -81,6 +99,55 @@ h2 {
 
 .table-wrap {
   overflow-x: auto;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.command-bar {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-muted);
+}
+
+.cmd-btn {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 6px;
+  height: 34px;
+  padding: 0 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cmd-btn:hover:not(:disabled) {
+  border-color: #93a4bb;
+}
+
+.cmd-btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.cmd-btn.primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.cmd-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .docs-table {
@@ -134,13 +201,19 @@ h2 {
 }
 
 .error {
-  color: #c0282f;
+  color: var(--danger);
+  margin: 1rem 0 0;
+  font-size: 0.92rem;
+}
+
+.success {
+  color: #166534;
   margin: 1rem 0 0;
   font-size: 0.92rem;
 }
 
 .empty {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.92rem;
 }
 
@@ -149,6 +222,49 @@ h2 {
   font-weight: 600;
   animation: blink 1s steps(2, start) infinite;
   margin: 0.75rem 0 0;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-panel {
+  width: min(460px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.25);
+}
+
+.modal-panel h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.modal-subtitle {
+  margin: 0.45rem 0 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.modal-panel input[type='file'] {
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.modal-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }
 
 .pagination {
@@ -188,6 +304,15 @@ code {
 @media (max-width: 900px) {
   .app-shell {
     padding: 1rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .command-bar {
+    justify-content: flex-end;
   }
 
   .guid-row {

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getContext } from '@microsoft/power-apps/app'
-import { AzureBlobStorageService } from './generated/services/AzureBlobStorageService'
 import './App.css'
 
 type DocumentRow = {
@@ -12,10 +11,9 @@ type DocumentRow = {
   sizeBytes: number | null
 }
 
-const CONTAINER_NAME = 'sales'
 const PAGE_SIZE = 5
-const FLOW_LIST_URL =
-  'https://apim-mcp-bulk-server.azure-api.net/blobs/getblobs/paths/invoke'
+const MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024
+const FLOW_LIST_URL = 'https://apim-mcp-bulk-server.azure-api.net/blobs/getblobs/paths/invoke'
 const guidPattern =
   /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
 
@@ -247,18 +245,14 @@ function App() {
   const [dataset, setDataset] = useState<string>('')
   const [recordGuid, setRecordGuid] = useState<string>('')
   const [documents, setDocuments] = useState<DocumentRow[]>([])
-  const [resolvedFolderPath, setResolvedFolderPath] = useState<string>('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isUploading, setIsUploading] = useState<boolean>(false)
   const [isDownloading, setIsDownloading] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [errorMessage, setErrorMessage] = useState<string>('')
-
-  const folderPath = useMemo(() => {
-    if (!recordGuid) return ''
-    return resolvedFolderPath || `${CONTAINER_NAME}/${recordGuid}`
-  }, [recordGuid, resolvedFolderPath])
+  const [statusMessage, setStatusMessage] = useState<string>('')
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(documents.length / PAGE_SIZE)),
@@ -317,7 +311,6 @@ function App() {
         }
       })
 
-      setResolvedFolderPath(`${CONTAINER_NAME}/${recordId}`)
       setDocuments(rows)
     },
     [],
@@ -423,7 +416,6 @@ function App() {
       const preferredDataset = queryDataset || 'default'
       setDataset(preferredDataset)
       setRecordGuid(resolvedGuid)
-      setResolvedFolderPath('')
 
       if (!resolvedGuid) {
         setDocuments([])
@@ -454,30 +446,102 @@ function App() {
     setCurrentPage(1)
   }, [documents])
 
+  const handleRefresh = useCallback(async () => {
+    if (!recordGuid) return
+
+    setIsLoading(true)
+    setErrorMessage('')
+    setStatusMessage('')
+    try {
+      await loadDocuments([dataset || 'default'], recordGuid)
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to refresh documents.'
+      setErrorMessage(message)
+      setDocuments([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [dataset, loadDocuments, recordGuid])
+
+  const handleFileSelection = useCallback((file: File | null) => {
+    setErrorMessage('')
+    setStatusMessage('')
+
+    if (!file) {
+      setSelectedFile(null)
+      return
+    }
+
+    if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+      setSelectedFile(null)
+      setErrorMessage('File size must be 10 MB or less.')
+      return
+    }
+
+    setSelectedFile(file)
+  }, [])
+
   const handleUpload = useCallback(async () => {
-    const activeDataset = dataset
-    if (!activeDataset || !recordGuid || !selectedFile) return
+    const activeDataset = dataset || 'default'
+    if (!recordGuid || !selectedFile) return
+
+    if (selectedFile.size > MAX_UPLOAD_SIZE_BYTES) {
+      setErrorMessage('File size must be 10 MB or less.')
+      return
+    }
 
     setIsUploading(true)
     setErrorMessage('')
+    setStatusMessage('')
 
     try {
       const content = await readFileAsDataUrl(selectedFile)
-      const upload = await AzureBlobStorageService.CreateFile_V2(
-        activeDataset,
-        folderPath,
-        selectedFile.name,
-        content,
-        true,
-        selectedFile.type || undefined,
-        true,
+      const fileBody = content.includes(',') ? content.split(',')[1] : content
+
+      const response = await withTimeout(
+        fetch(FLOW_LIST_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: recordGuid,
+            operationname: 'upload',
+            blobname: selectedFile.name,
+            $multipart: [
+              {
+                headers: {
+                  'Content-Disposition': `form-data; name="file"; filename="${selectedFile.name}"`,
+                  'Content-Type': selectedFile.type || 'application/octet-stream',
+                },
+                body: fileBody,
+              },
+            ],
+          }),
+        }),
+        30000,
+        `Flow HTTP upload (${selectedFile.name})`,
       )
 
-      if (!upload.success) {
-        throw new Error(upload.error?.message ?? 'Failed to upload file.')
+      if (!response.ok) {
+        const text = await response.text()
+        throw new Error(`Upload failed with HTTP ${response.status}: ${text || response.statusText}`)
+      }
+
+      const uploadResult = (await withTimeout(
+        response.json(),
+        10000,
+        'Flow upload JSON parse',
+      )) as { status?: string; message?: string }
+
+      if (uploadResult.status !== 'ok') {
+        throw new Error(uploadResult.message || 'Upload failed.')
       }
 
       setSelectedFile(null)
+      setIsUploadModalOpen(false)
+      setStatusMessage(uploadResult.message || 'File has been uploaded successfully.')
       await loadDocuments([activeDataset], recordGuid)
     } catch (error) {
       const message =
@@ -486,7 +550,7 @@ function App() {
     } finally {
       setIsUploading(false)
     }
-  }, [dataset, folderPath, loadDocuments, recordGuid, selectedFile])
+  }, [dataset, loadDocuments, recordGuid, selectedFile])
 
   return (
     <main className="app-shell">
@@ -498,13 +562,34 @@ function App() {
       </header>
 
       {errorMessage ? <p className="error">{errorMessage}</p> : null}
+      {statusMessage ? <p className="success">{statusMessage}</p> : null}
       {isDownloading ? <p className="download-indicator">Downloading...</p> : null}
 
       <section className="panel section">
-        <h2>Documents</h2>
+        <div className="section-header">
+          <h2>Documents</h2>
+          <div className="command-bar" role="toolbar" aria-label="Document commands">
+            <button
+              type="button"
+              className="cmd-btn"
+              onClick={() => void handleRefresh()}
+              disabled={isLoading || !recordGuid}
+            >
+              Refresh
+            </button>
+            <button
+              type="button"
+              className="cmd-btn primary"
+              onClick={() => setIsUploadModalOpen(true)}
+              disabled={!recordGuid}
+            >
+              Upload File
+            </button>
+          </div>
+        </div>
         {isLoading ? <p className="empty">Loading documents...</p> : null}
         {!isLoading && documents.length === 0 ? (
-          <p className="empty">No documents found for this record.</p>
+          <p className="empty">No records found.</p>
         ) : null}
         {!isLoading && documents.length > 0 ? (
           <div className="table-wrap">
@@ -563,21 +648,49 @@ function App() {
         ) : null}
       </section>
 
-      <section className="panel section upload-row">
-        <input
-          type="file"
-          onChange={(event) =>
-            setSelectedFile(event.target.files?.[0] ?? null)
-          }
-        />
-        <button
-          type="button"
-          onClick={() => void handleUpload()}
-          disabled={!selectedFile || isUploading || !recordGuid}
+      {isUploadModalOpen ? (
+        <div
+          className="modal-backdrop"
+          onClick={() => {
+            if (isUploading) return
+            setIsUploadModalOpen(false)
+            setSelectedFile(null)
+          }}
         >
-          {isUploading ? 'Uploading...' : 'Upload File'}
-        </button>
-      </section>
+          <div className="modal-panel" onClick={(event) => event.stopPropagation()}>
+            <h3>Upload Document</h3>
+            <p className="modal-subtitle">
+              Select a file to upload to this record.
+            </p>
+            <input
+              type="file"
+              onChange={(event) => handleFileSelection(event.target.files?.[0] ?? null)}
+            />
+            <p className="modal-subtitle">Maximum file size: 10 MB.</p>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="cmd-btn"
+                onClick={() => {
+                  setIsUploadModalOpen(false)
+                  setSelectedFile(null)
+                }}
+                disabled={isUploading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="cmd-btn primary"
+                onClick={() => void handleUpload()}
+                disabled={!selectedFile || isUploading || !recordGuid}
+              >
+                {isUploading ? 'Uploading...' : 'Upload'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   )
 }
