@@ -1,0 +1,301 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "description": "Get records from Dataverse table",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "operationname": {
+                                "type": "string"
+                            },
+                            "blobname": {
+                                "type": "string"
+                            },
+                            "$multipart": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "headers": {
+                                            "type": "object"
+                                        },
+                                        "body": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "actions": {
+            "Get_storage_account_name": {
+                "type": "Compose",
+                "inputs": "stshashankbh602320644473 ",
+                "runAfter": {}
+            },
+            "storage_folder_path": {
+                "type": "Compose",
+                "inputs": "/sales/@{triggerBody()?['id']}",
+                "runAfter": {
+                    "Get_storage_account_name": [
+                        "Succeeded"
+                    ]
+                }
+            },
+            "if_operation_is_list": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        {
+                            "equals": [
+                                "@triggerBody()?['operationname']",
+                                "list"
+                            ]
+                        }
+                    ]
+                },
+                "actions": {
+                    "Lists_blobs_(V2)": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                }
+                            },
+                            "method": "get",
+                            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/foldersV2/@{encodeURIComponent(encodeURIComponent(outputs('storage_folder_path')))}",
+                            "queries": {
+                                "nextPageMarker": "",
+                                "useFlatListing": false
+                            }
+                        }
+                    },
+                    "Response": {
+                        "type": "Response",
+                        "kind": "Http",
+                        "inputs": {
+                            "statusCode": 200,
+                            "headers": {
+                                "Content-Type": "application/json"
+                            },
+                            "body": "@{if(empty(body('Lists_blobs_(V2)')?['value']), json('[]'), body('Lists_blobs_(V2)')?['value'])}"
+                        },
+                        "runAfter": {
+                            "Lists_blobs_(V2)": [
+                                "Succeeded"
+                            ]
+                        }
+                    },
+                    "Response_empty_list_fallback": {
+                        "type": "Response",
+                        "kind": "Http",
+                        "inputs": {
+                            "statusCode": 200,
+                            "headers": {
+                                "Content-Type": "application/json"
+                            },
+                            "body": "[]"
+                        },
+                        "runAfter": {
+                            "Lists_blobs_(V2)": [
+                                "Failed",
+                                "TimedOut",
+                                "Skipped"
+                            ]
+                        }
+                    }
+                },
+                "else": {
+                    "actions": {
+                        "if_upload": {
+                            "type": "If",
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@triggerBody()?['operationname']",
+                                            "upload"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "actions": {
+                                "File_content": {
+                                    "type": "Compose",
+                                    "inputs": "@first(triggerBody()?['$multipart'])['body']"
+                                },
+                                "get_file_name": {
+                                    "type": "Compose",
+                                    "inputs": "@replace(split(split(first(triggerBody()?['$multipart'])['headers']['Content-Disposition'],';')[2],'=')[1],'\"','')",
+                                    "runAfter": {
+                                        "File_content": [
+                                            "Succeeded"
+                                        ]
+                                    }
+                                },
+                                "Create_blob_(V2)": {
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azureblob-1']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "body": "@base64ToBinary(outputs('File_content'))",
+                                        "headers": {
+                                            "ReadFileMetadataFromServer": true
+                                        },
+                                        "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files",
+                                        "queries": {
+                                            "folderPath": "/sales/@{triggerBody()?['id']}",
+                                            "name": "@{outputs('get_file_name')}",
+                                            "queryParametersSingleEncoded": true
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "get_file_name": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    }
+                                },
+                                "success_response": {
+                                    "type": "Response",
+                                    "kind": "Http",
+                                    "inputs": {
+                                        "statusCode": 200,
+                                        "body": {
+                                            "status": "ok",
+                                            "message": "File has been uploaded successfully"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Create_blob_(V2)": [
+                                            "Succeeded"
+                                        ]
+                                    }
+                                }
+                            },
+                            "else": {
+                                "actions": {
+                                    "Get_blob_content_(V2)": {
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                                }
+                                            },
+                                            "method": "get",
+                                            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files/@{encodeURIComponent(encodeURIComponent(outputs('storage_folder_path'),'/',triggerBody()?['blobname']))}/content",
+                                            "queries": {
+                                                "inferContentType": true
+                                            }
+                                        }
+                                    },
+                                    "return_blob": {
+                                        "type": "Response",
+                                        "kind": "Http",
+                                        "inputs": {
+                                            "statusCode": 200,
+                                            "headers": {
+                                                "Content-Disposition": "attachment; filename=@{triggerBody()?['blobname']}"
+                                            },
+                                            "body": "@body('Get_blob_content_(V2)')"
+                                        },
+                                        "runAfter": {
+                                            "Get_blob_content_(V2)": [
+                                                "Succeeded"
+                                            ]
+                                        }
+                                    },
+                                    "return_empty_array_on_blob_failure": {
+                                        "type": "Response",
+                                        "kind": "Http",
+                                        "inputs": {
+                                            "statusCode": 200,
+                                            "headers": {
+                                                "Content-Type": "application/json"
+                                            },
+                                            "body": "[]"
+                                        },
+                                        "runAfter": {
+                                            "Get_blob_content_(V2)": [
+                                                "Failed"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "runAfter": {
+                    "storage_folder_path": [
+                        "Succeeded"
+                    ]
+                }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "Environment_": {
+                "defaultValue": "",
+                "type": "String"
+            },
+            "TableName_": {
+                "defaultValue": "",
+                "type": "String"
+            },
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "Environment_": {
+            "value": "https://wa-development.crm4.dynamics.com"
+        },
+        "TableName_": {
+            "value": "contacts"
+        },
+        "$connections": {
+            "type": "Object",
+            "value": {
+                "azureblob": {
+                    "id": "/subscriptions/0ef7403c-7292-4714-bfb9-1fcbddb71bfc/providers/Microsoft.Web/locations/eastus/managedApis/azureblob",
+                    "connectionId": "/subscriptions/0ef7403c-7292-4714-bfb9-1fcbddb71bfc/resourceGroups/ShashankTest/providers/Microsoft.Web/connections/azureblob",
+                    "connectionName": "azureblob",
+                    "connectionProperties": {}
+                },
+                "azureblob-1": {
+                    "id": "/subscriptions/0ef7403c-7292-4714-bfb9-1fcbddb71bfc/providers/Microsoft.Web/locations/eastus/managedApis/azureblob",
+                    "connectionId": "/subscriptions/0ef7403c-7292-4714-bfb9-1fcbddb71bfc/resourceGroups/ShashankTest/providers/Microsoft.Web/connections/azureblob",
+                    "connectionName": "azureblob",
+                    "connectionProperties": {}
+                }
+            }
+        }
+    }
+}
