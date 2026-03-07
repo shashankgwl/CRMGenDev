@@ -14,8 +14,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 async function runAutofill(context, options) {
   const bridgeReady = await ensureBridgeInjected();
-  const formInfo = bridgeReady ? await collectDataverseFormViaBridge() : null;
-  const fields = normalizeFieldsForAi(formInfo?.fields || collectFields());
+  if (!bridgeReady) {
+    throw new Error("Dataverse Xrm context unavailable. Autofill stopped to avoid updating secure fields unsafely. Refresh page and try again.");
+  }
+
+  const formInfo = await collectDataverseFormViaBridge();
+  const fields = normalizeFieldsForAi(formInfo?.fields || []);
 
   if (fields.length === 0) {
     throw new Error("No editable fields found on this page.");
@@ -34,23 +38,17 @@ async function runAutofill(context, options) {
     throw new Error(response?.error || "AI generation failed.");
   }
 
-  let updates = 0;
-  let skipped = [];
-  if (bridgeReady) {
-    const applyResult = await applyViaBridge(response.data, options);
-    updates = applyResult?.updated || 0;
-    skipped = applyResult?.skipped || [];
-    if (Array.isArray(applyResult?.debug)) {
-      for (const line of applyResult.debug.slice(-50)) {
-        try {
-          console.warn(line);
-        } catch {
-          // no-op
-        }
+  const applyResult = await applyViaBridge(response.data, options);
+  const updates = applyResult?.updated || 0;
+  const skipped = applyResult?.skipped || [];
+  if (Array.isArray(applyResult?.debug)) {
+    for (const line of applyResult.debug.slice(-80)) {
+      try {
+        console.warn(line);
+      } catch {
+        // no-op
       }
     }
-  } else {
-    throw new Error("Dataverse Xrm context unavailable. Autofill stopped to avoid updating secure fields unsafely. Refresh page and try again.");
   }
 
   return {
@@ -67,114 +65,6 @@ function normalizeFieldsForAi(fields) {
     label: f.label || "",
     type: f.type || "text"
   }));
-}
-
-function collectFields() {
-  const all = Array.from(
-    document.querySelectorAll("input, textarea, select")
-  ).filter(isEditable);
-
-  return all.map((el) => {
-    const label = findLabel(el);
-    return {
-      id: el.id || "",
-      name: el.name || "",
-      label,
-      type: normalizeType(el)
-    };
-  });
-}
-
-function isEditable(el) {
-  if (!(el instanceof HTMLElement)) return false;
-  if (el.hasAttribute("disabled") || el.getAttribute("aria-disabled") === "true") return false;
-  if (el.getAttribute("readonly") !== null) return false;
-  if (el instanceof HTMLInputElement) {
-    const blocked = ["hidden", "button", "submit", "reset", "checkbox", "radio", "file"];
-    if (blocked.includes((el.type || "").toLowerCase())) return false;
-  }
-
-  const style = window.getComputedStyle(el);
-  if (style.display === "none" || style.visibility === "hidden") return false;
-  return true;
-}
-
-function findLabel(el) {
-  const fromLabelFor = el.id
-    ? document.querySelector(`label[for="${CSS.escape(el.id)}"]`)
-    : null;
-  if (fromLabelFor?.textContent) return fromLabelFor.textContent.trim();
-
-  const parentLabel = el.closest("label");
-  if (parentLabel?.textContent) return parentLabel.textContent.trim();
-
-  const aria = el.getAttribute("aria-label");
-  if (aria) return aria.trim();
-
-  const placeholder = el.getAttribute("placeholder");
-  if (placeholder) return placeholder.trim();
-
-  return "";
-}
-
-function normalizeType(el) {
-  if (el instanceof HTMLTextAreaElement) return "textarea";
-  if (el instanceof HTMLSelectElement) return "select";
-  if (el instanceof HTMLInputElement) return el.type || "text";
-  return "text";
-}
-
-function applyValues(valuesByFieldKey, includeLockedFields) {
-  let updated = 0;
-  const fields = Array.from(document.querySelectorAll("input, textarea, select"))
-    .filter((el) => (includeLockedFields ? isPotentiallyFillable(el) : isEditable(el)));
-
-  for (const el of fields) {
-    const key = el.id || el.name;
-    if (!key) continue;
-    const newValue = valuesByFieldKey[key];
-    if (newValue === undefined || newValue === null) continue;
-
-    setElementValue(el, String(newValue));
-    updated += 1;
-  }
-
-  return updated;
-}
-
-function isPotentiallyFillable(el) {
-  if (!(el instanceof HTMLElement)) return false;
-  if (el instanceof HTMLInputElement) {
-    const blocked = ["hidden", "button", "submit", "reset", "checkbox", "radio", "file"];
-    if (blocked.includes((el.type || "").toLowerCase())) return false;
-  }
-
-  const style = window.getComputedStyle(el);
-  if (style.display === "none" || style.visibility === "hidden") return false;
-  return true;
-}
-
-function setElementValue(el, value) {
-  if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
-    el.focus();
-    el.value = value;
-    el.dispatchEvent(new Event("input", { bubbles: true }));
-    el.dispatchEvent(new Event("change", { bubbles: true }));
-    el.blur();
-    return;
-  }
-
-  if (el instanceof HTMLSelectElement) {
-    const option = Array.from(el.options).find((opt) => {
-      return opt.value.toLowerCase() === value.toLowerCase() ||
-        opt.textContent?.trim().toLowerCase() === value.toLowerCase();
-    });
-
-    if (option) {
-      el.value = option.value;
-      el.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-  }
 }
 
 async function ensureBridgeInjected() {

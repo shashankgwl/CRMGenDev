@@ -149,17 +149,18 @@
       processedKeys.add(key);
       const attr = ctx.getAttribute && ctx.getAttribute(key);
       if (!attr) {
-        debugLog(`Field '${key}': attribute not found.`);
+        debugFieldDecision(key, null, null, "skipped:attribute_not_found");
         skipped.push({ key, reason: "attribute_not_found" });
         continue;
       }
-      if (isFieldLevelSecurityBlocked(attr)) {
-        debugLog(`Field '${key}': skipped (field_level_security).`);
+      const access = inspectFieldAccess(ctx, attr);
+      if (access.flsBlocked) {
+        debugFieldDecision(key, access.disabled, access.canUpdate, "skipped:field_level_security");
         skipped.push({ key, reason: "field_level_security" });
         continue;
       }
-      if (!includeLockedFields && isAttributeLocked(ctx, attr)) {
-        debugLog(`Field '${key}': skipped (locked_field).`);
+      if (!includeLockedFields && access.locked) {
+        debugFieldDecision(key, access.disabled, access.canUpdate, "skipped:locked_field");
         skipped.push({ key, reason: "locked_field" });
         continue;
       }
@@ -167,7 +168,12 @@
       const type = typeof attr.getAttributeType === "function" ? attr.getAttributeType() : "unknown";
       const parsed = parseForAttributeType(type, value, attr);
       if (!parsed.supported) {
-        debugLog(`Field '${key}': skipped (${parsed.reason || "unsupported_type"}).`);
+        debugFieldDecision(
+          key,
+          access.disabled,
+          access.canUpdate,
+          `skipped:${parsed.reason || "unsupported_type"}`
+        );
         skipped.push({ key, reason: parsed.reason || "unsupported_type", type });
         continue;
       }
@@ -178,9 +184,14 @@
           attr.fireOnChange();
         }
         updates.push({ key, type });
-        debugLog(`Field '${key}': updated (type=${type}).`);
+        debugFieldDecision(key, access.disabled, access.canUpdate, `updated:type=${type}`);
       } catch (error) {
-        debugLog(`Field '${key}': set_failed (${error && error.message ? error.message : String(error)}).`);
+        debugFieldDecision(
+          key,
+          access.disabled,
+          access.canUpdate,
+          `skipped:set_failed:${error && error.message ? error.message : String(error)}`
+        );
         skipped.push({ key, reason: "set_failed", details: error && error.message ? error.message : String(error) });
       }
     }
@@ -210,17 +221,21 @@
       const currentValue = typeof attr.getValue === "function" ? attr.getValue() : null;
       if (currentValue !== null && currentValue !== undefined && currentValue !== "") continue;
 
-      if (isFieldLevelSecurityBlocked(attr)) {
+      const access = inspectFieldAccess(ctx, attr);
+      if (access.flsBlocked) {
+        debugFieldDecision(key, access.disabled, access.canUpdate, "skipped:field_level_security");
         skipped.push({ key, reason: "field_level_security" });
         continue;
       }
-      if (!includeLockedFields && isAttributeLocked(ctx, attr)) {
+      if (!includeLockedFields && access.locked) {
+        debugFieldDecision(key, access.disabled, access.canUpdate, "skipped:locked_field");
         skipped.push({ key, reason: "locked_field" });
         continue;
       }
 
       const randomValue = getRandomOptionValue(attr, type);
       if (randomValue === null) {
+        debugFieldDecision(key, access.disabled, access.canUpdate, "skipped:option_not_found");
         skipped.push({ key, reason: "option_not_found", type });
         continue;
       }
@@ -231,7 +246,14 @@
           attr.fireOnChange();
         }
         updates.push({ key, type, source: "random_optionset" });
+        debugFieldDecision(key, access.disabled, access.canUpdate, "updated:source=random_optionset");
       } catch (error) {
+        debugFieldDecision(
+          key,
+          access.disabled,
+          access.canUpdate,
+          `skipped:set_failed:${error && error.message ? error.message : String(error)}`
+        );
         skipped.push({ key, reason: "set_failed", details: error && error.message ? error.message : String(error) });
       }
     }
@@ -250,24 +272,27 @@
   }
 
   function isAttributeLocked(ctx, attr) {
+    return inspectLockState(ctx, attr).locked;
+  }
+
+  function inspectLockState(ctx, attr) {
     const formContext = getFormContext();
     const attrName = typeof attr?.getName === "function" ? attr.getName() : "";
     if (formContext && attrName) {
       const disabled = isControlDisabledOnFormContext(formContext, attrName);
-      debugLog(`Field '${attrName}': formContext.getControl('${attrName}').getDisabled() => ${String(disabled)}`);
       if (disabled !== null) {
-        return disabled;
+        return { locked: disabled, disabled };
       }
     }
 
     const controlsApi = attr && attr.controls;
     if (!controlsApi || typeof controlsApi.get !== "function") {
-      return false;
+      return { locked: false, disabled: null };
     }
 
     const controls = controlsApi.get() || [];
     if (!controls.length) {
-      return false;
+      return { locked: false, disabled: null };
     }
 
     let checkedAny = false;
@@ -276,9 +301,6 @@
       if (formContext && typeof control?.getName === "function") {
         const controlName = control.getName();
         const controlDisabled = isControlDisabledOnFormContext(formContext, controlName);
-        if (controlName) {
-          debugLog(`Field '${attrName || "unknown"}': formContext.getControl('${controlName}').getDisabled() => ${String(controlDisabled)}`);
-        }
         if (controlDisabled !== null) {
           checkedAny = true;
           if (controlDisabled === true) {
@@ -298,9 +320,9 @@
     }
 
     if (!checkedAny) {
-      return false;
+      return { locked: false, disabled: null };
     }
-    return foundDisabled;
+    return { locked: foundDisabled, disabled: foundDisabled };
   }
 
   function isControlDisabledOnFormContext(formContext, arg) {
@@ -342,20 +364,42 @@
   }
 
   function isFieldLevelSecurityBlocked(attr) {
+    return getCanUpdatePrivilege(attr) !== true;
+  }
+
+  function getCanUpdatePrivilege(attr) {
     const privilegedAttr = getPrivilegedAttribute(attr);
     if (!privilegedAttr || typeof privilegedAttr.getUserPrivilege !== "function") {
-      return false;
+      return null;
     }
 
     try {
       const privilege = privilegedAttr.getUserPrivilege();
       if (!privilege || typeof privilege !== "object") {
-        return true;
+        return null;
       }
-      return privilege.canUpdate !== true;
+      return privilege.canUpdate === true;
     } catch {
-      return true;
+      return null;
     }
+  }
+
+  function inspectFieldAccess(ctx, attr) {
+    if(attr.name === "address1_line1" || attr.getName() === "address1_line2") {
+      console.warn("Inspecting access for address1_line1");
+    }
+    const lockState = inspectLockState(ctx, attr);
+    const canUpdate = getCanUpdatePrivilege(attr);
+    return {
+      disabled: lockState.disabled,
+      locked: lockState.locked,
+      canUpdate,
+      flsBlocked: canUpdate !== true
+    };
+  }
+
+  function debugFieldDecision(fieldName, disabled, canUpdate, action) {
+    debugLog(`field=${fieldName} disabled=${String(disabled)} canUpdate=${String(canUpdate)} action=${action}`);
   }
 
   function parseForAttributeType(type, value, attr) {
