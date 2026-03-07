@@ -80,6 +80,6 @@ Note: Azure requests are sent using the Responses API.
   - Field may be unsupported type or not present on the active form runtime context.
   - Some complex lookup scenarios may require explicit value objects.
 
-## Development Note
+## Issues
 
-After code changes, reload the extension from `edge://extensions` before retesting.
+1. It skips to fill some fields (locked/unlocked) because of a null issue, work in progress.
