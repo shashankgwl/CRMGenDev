@@ -1,8 +1,4 @@
 const DEFAULT_CONFIG = {
-  provider: "openai",
-  openaiApiKey: "",
-  openaiModel: "gpt-4o-mini",
-  openaiBaseUrl: "https://api.openai.com/v1/chat/completions",
   azureApiKey: "",
   azureEndpoint: "",
   azureModel: "gpt-5.1",
@@ -13,10 +9,6 @@ const statusEl = document.getElementById("status");
 const saveBtn = document.getElementById("saveBtn");
 
 const fields = {
-  provider: document.getElementById("provider"),
-  openaiApiKey: document.getElementById("openaiApiKey"),
-  openaiModel: document.getElementById("openaiModel"),
-  openaiBaseUrl: document.getElementById("openaiBaseUrl"),
   azureApiKey: document.getElementById("azureApiKey"),
   azureEndpoint: document.getElementById("azureEndpoint"),
   azureModel: document.getElementById("azureModel"),

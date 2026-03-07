@@ -8,34 +8,14 @@
   </head>
   <body>
     <main>
-      <h1>Dataverse AI Autofill Settings</h1>
+      <h1>Dataverse AI Autofill Settings (Azure)</h1>
 
       <section>
-        <label for="provider">Provider</label>
-        <select id="provider">
-          <option value="openai">OpenAI</option>
-          <option value="azure">Azure AI Foundry / Azure OpenAI</option>
-        </select>
-      </section>
-
-      <section>
-        <h2>OpenAI</h2>
-        <label for="openaiApiKey">API key</label>
-        <input id="openaiApiKey" type="password" />
-
-        <label for="openaiModel">Model</label>
-        <input id="openaiModel" type="text" placeholder="gpt-4o-mini" />
-
-        <label for="openaiBaseUrl">Chat completions URL</label>
-        <input id="openaiBaseUrl" type="text" />
-      </section>
-
-      <section>
-        <h2>Azure</h2>
+        <h2>AI Foundry</h2>
         <label for="azureEndpoint">Endpoint</label>
         <input id="azureEndpoint" type="text" placeholder="https://YOUR-RESOURCE.openai.azure.com" />
 
-        <label for="azureModel">Model</label>
+        <label for="azureModel">Deployment Name</label>
         <input id="azureModel" type="text" placeholder="gpt-5.1" />
 
         <label for="azureApiKey">API key</label>

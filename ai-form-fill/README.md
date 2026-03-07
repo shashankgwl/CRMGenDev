@@ -1,6 +1,6 @@
 # Dataverse AI Autofill (Edge Extension)
 
-Edge extension to autofill Microsoft Dataverse forms using OpenAI or Azure AI Foundry.
+Edge extension to autofill Microsoft Dataverse forms using Azure AI Foundry.
 
 ## Features
 
@@ -27,9 +27,7 @@ Edge extension to autofill Microsoft Dataverse forms using OpenAI or Azure AI Fo
 
 - Microsoft Edge (latest recommended).
 - Access to a Dataverse environment.
-- One provider:
-  - OpenAI API key, or
-  - Azure AI Foundry / Azure OpenAI endpoint + model + key.
+- Azure AI Foundry / Azure OpenAI endpoint + model + key.
 
 ## Manual Installation (Edge)
 
@@ -56,14 +54,7 @@ Edge extension to autofill Microsoft Dataverse forms using OpenAI or Azure AI Fo
 1. Click the extension icon in Edge toolbar.
 2. Click the gear icon.
 3. Select `Settings`.
-4. Configure provider details.
-
-### OpenAI Settings
-
-- Provider: `OpenAI`
-- `API key`
-- `Model` (example: `gpt-4o-mini`)
-- `Chat completions URL` (default: `https://api.openai.com/v1/chat/completions`)
+4. Configure Azure details.
 
 ### Azure Settings
 

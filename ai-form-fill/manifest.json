@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Dataverse AI Autofill",
   "version": "0.1.0",
-  "description": "Autofill Dataverse forms using OpenAI or Azure AI Foundry endpoints.",
+  "description": "Autofill Dataverse forms using Azure AI Foundry endpoints.",
   "icons": {
     "16": "assets/icons/icon-16.png",
     "32": "assets/icons/icon-32.png",
@@ -17,7 +17,6 @@
   "host_permissions": [
     "https://*.dynamics.com/*",
     "https://*.powerapps.com/*",
-    "https://api.openai.com/*",
     "https://*.openai.azure.com/*"
   ],
   "background": {

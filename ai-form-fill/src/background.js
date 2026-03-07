@@ -1,8 +1,4 @@
 const DEFAULT_CONFIG = {
-  provider: "openai",
-  openaiApiKey: "",
-  openaiModel: "gpt-4o-mini",
-  openaiBaseUrl: "https://api.openai.com/v1/chat/completions",
   azureApiKey: "",
   azureEndpoint: "",
   azureModel: "gpt-5.1",
@@ -38,11 +34,7 @@ async function generateFieldValues(payload) {
   }
   const prompt = buildPrompt(payload);
 
-  if (config.provider === "azure") {
-    return callAzure(config, prompt);
-  }
-
-  return callOpenAI(config, prompt);
+  return callAzure(config, prompt);
 }
 
 function buildPrompt(payload) {
@@ -67,37 +59,6 @@ function buildPrompt(payload) {
     "Fields:",
     fieldsText
   ].join("\n");
-}
-
-async function callOpenAI(config, prompt) {
-  if (!config.openaiApiKey) {
-    throw new Error("OpenAI API key is missing. Set it in extension options.");
-  }
-
-  const response = await fetch(config.openaiBaseUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${config.openaiApiKey}`
-    },
-    body: JSON.stringify({
-      model: config.openaiModel,
-      messages: [
-        { role: "system", content: "You are a precise JSON generator." },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.3
-    })
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`OpenAI request failed: ${response.status} ${text}`);
-  }
-
-  const data = await response.json();
-  const content = extractAssistantText(data);
-  return parseAiJson(content);
 }
 
 async function callAzure(config, prompt) {

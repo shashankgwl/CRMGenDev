@@ -40,8 +40,17 @@ async function runAutofill(context, options) {
     const applyResult = await applyViaBridge(response.data, options);
     updates = applyResult?.updated || 0;
     skipped = applyResult?.skipped || [];
+    if (Array.isArray(applyResult?.debug)) {
+      for (const line of applyResult.debug.slice(-50)) {
+        try {
+          console.warn(line);
+        } catch {
+          // no-op
+        }
+      }
+    }
   } else {
-    updates = applyValues(response.data, Boolean(options?.fillLockedFields));
+    throw new Error("Dataverse Xrm context unavailable. Autofill stopped to avoid updating secure fields unsafely. Refresh page and try again.");
   }
 
   return {
