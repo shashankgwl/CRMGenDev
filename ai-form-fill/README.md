@@ -84,3 +84,4 @@ Note: Azure requests are sent using the Responses API.
 
 1. It skips to fill some fields (locked/unlocked) because of a null issue, work in progress.
 2. Lookups not supported yet in current version.
+3. Script might time out for very big forms.
