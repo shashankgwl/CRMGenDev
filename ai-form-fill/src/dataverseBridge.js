@@ -4,6 +4,7 @@
   }
   window.__dataverseBridgeInstalled = true;
   window.__dataverseBridgeDebug = window.__dataverseBridgeDebug || [];
+  const entityMetadataCache = new Map();
 
   const REQUEST_EVENT = "DATAVERSE_BRIDGE_REQUEST";
   const RESPONSE_EVENT = "DATAVERSE_BRIDGE_RESPONSE";
@@ -14,20 +15,20 @@
     const type = detail.type;
     const payload = detail.payload || {};
 
-    try {
-      let data;
-      if (type === "COLLECT_FORM") {
-        data = collectForm();
-      } else if (type === "APPLY_VALUES") {
-        data = applyValues(payload.values || {}, payload.options || {});
-      } else {
+    Promise.resolve()
+      .then(async () => {
+        if (type === "COLLECT_FORM") {
+          return collectForm();
+        }
+        if (type === "APPLY_VALUES") {
+          return applyValues(payload.values || {}, payload.options || {});
+        }
         throw new Error("Unsupported bridge request type.");
-      }
-
-      dispatchResponse(requestId, true, data);
-    } catch (error) {
-      dispatchResponse(requestId, false, null, error && error.message ? error.message : String(error));
-    }
+      })
+      .then((data) => dispatchResponse(requestId, true, data))
+      .catch((error) =>
+        dispatchResponse(requestId, false, null, error && error.message ? error.message : String(error))
+      );
   });
 
   function dispatchResponse(requestId, ok, data, error) {
@@ -134,7 +135,7 @@
     };
   }
 
-  function applyValues(valuesByKey, options) {
+  async function applyValues(valuesByKey, options) {
     const ctx = getFormContext();
     if (!ctx) {
       throw new Error("Xrm form context was not found on this page.");
@@ -166,8 +167,77 @@
       }
 
       const type = typeof attr.getAttributeType === "function" ? attr.getAttributeType() : "unknown";
+      if (String(key).toLowerCase() === "ownerid") {
+        const ownerLookup = resolveCurrentUserOwnerLookup();
+        if (!ownerLookup) {
+          debugFieldDecision(key, access.disabled, access.canUpdate, "skipped:owner_resolution_failed");
+          skipped.push({ key, reason: "owner_resolution_failed", type });
+          continue;
+        }
+        try {
+          attr.setValue(ownerLookup);
+          if (typeof attr.fireOnChange === "function") {
+            attr.fireOnChange();
+          }
+          updates.push({ key, type, source: "current_user_owner" });
+          debugFieldDecision(key, access.disabled, access.canUpdate, "updated:source=current_user_owner");
+          continue;
+        } catch (error) {
+          debugFieldDecision(
+            key,
+            access.disabled,
+            access.canUpdate,
+            `skipped:set_failed:${error && error.message ? error.message : String(error)}`
+          );
+          skipped.push({
+            key,
+            reason: "set_failed",
+            details: error && error.message ? error.message : String(error)
+          });
+          continue;
+        }
+      }
+
       const parsed = parseForAttributeType(type, value, attr);
       if (!parsed.supported) {
+        if (["lookup", "customer", "owner"].includes(type)) {
+          const resolvedLookup = await resolveLookupTopActive(ctx, attr, key);
+          if (resolvedLookup?.supported) {
+            try {
+              attr.setValue(resolvedLookup.value);
+              if (typeof attr.fireOnChange === "function") {
+                attr.fireOnChange();
+              }
+              updates.push({ key, type, source: "lookup_top1_active" });
+              debugFieldDecision(key, access.disabled, access.canUpdate, "updated:source=lookup_top1_active");
+              continue;
+            } catch (error) {
+              debugFieldDecision(
+                key,
+                access.disabled,
+                access.canUpdate,
+                `skipped:set_failed:${error && error.message ? error.message : String(error)}`
+              );
+              skipped.push({
+                key,
+                reason: "set_failed",
+                details: error && error.message ? error.message : String(error)
+              });
+              continue;
+            }
+          }
+          if (resolvedLookup?.reason) {
+            debugFieldDecision(
+              key,
+              access.disabled,
+              access.canUpdate,
+              `skipped:${resolvedLookup.reason}`
+            );
+            skipped.push({ key, reason: resolvedLookup.reason, type });
+            continue;
+          }
+        }
+
         debugFieldDecision(
           key,
           access.disabled,
@@ -196,7 +266,7 @@
       }
     }
 
-    fillRandomEmptyOptionSets(ctx, processedKeys, includeLockedFields, updates, skipped);
+    await fillRandomEmptyOptionSets(ctx, processedKeys, includeLockedFields, updates, skipped);
 
     return {
       updated: updates.length,
@@ -206,7 +276,7 @@
     };
   }
 
-  function fillRandomEmptyOptionSets(ctx, processedKeys, includeLockedFields, updates, skipped) {
+  async function fillRandomEmptyOptionSets(ctx, processedKeys, includeLockedFields, updates, skipped) {
     if (typeof ctx.getAttribute !== "function") return;
     const attrs = ctx.getAttribute() || [];
 
@@ -385,9 +455,6 @@
   }
 
   function inspectFieldAccess(ctx, attr) {
-    if(attr.name === "address1_line1" || attr.getName() === "address1_line2") {
-      console.warn("Inspecting access for address1_line1");
-    }
     const lockState = inspectLockState(ctx, attr);
     const canUpdate = getCanUpdatePrivilege(attr);
     return {
@@ -491,6 +558,164 @@
     return options
       .map((opt) => opt && opt.value)
       .filter((value) => typeof value === "number" && !Number.isNaN(value));
+  }
+
+  async function resolveLookupTopActive(ctx, attr, attrName) {
+    const targets = getLookupTargets(ctx, attr, attrName);
+    if (!targets.length) {
+      return { supported: false, reason: "lookup_target_not_found" };
+    }
+
+    const entityType = targets[0];
+    const metadata = await getEntityMetadata(entityType);
+    if (!metadata?.primaryIdAttribute) {
+      return { supported: false, reason: "lookup_metadata_missing" };
+    }
+
+    const idAttr = metadata.primaryIdAttribute;
+    const nameAttr = metadata.primaryNameAttribute || "";
+
+    const activeFetchXml = buildLookupFetchXml(entityType, idAttr, nameAttr, true);
+    let result = await retrieveByFetchXml(entityType, activeFetchXml);
+    if (!result?.entities?.length) {
+      const fallbackFetchXml = buildLookupFetchXml(entityType, idAttr, nameAttr, false);
+      result = await retrieveByFetchXml(entityType, fallbackFetchXml);
+    }
+
+    const row = result?.entities?.[0];
+    if (!row) {
+      return { supported: false, reason: "lookup_no_records" };
+    }
+
+    const rawId = row[idAttr];
+    if (!rawId) {
+      return { supported: false, reason: "lookup_id_missing" };
+    }
+
+    const id = formatGuidForLookup(rawId);
+    const name = nameAttr ? String(row[nameAttr] || "") : "";
+
+    return {
+      supported: true,
+      value: [{ id, name, entityType }]
+    };
+  }
+
+  function getLookupTargets(ctx, attr, attrName) {
+    let targets = [];
+
+    if (typeof attr?.getLookupTypes === "function") {
+      try {
+        const t = attr.getLookupTypes();
+        if (Array.isArray(t)) targets = targets.concat(t);
+      } catch {
+        // no-op
+      }
+    }
+
+    const controls = typeof attr?.controls?.get === "function" ? attr.controls.get() : [];
+    for (const control of controls) {
+      if (!control || typeof control.getEntityTypes !== "function") continue;
+      try {
+        const t = control.getEntityTypes();
+        if (Array.isArray(t)) targets = targets.concat(t);
+      } catch {
+        // no-op
+      }
+    }
+
+    if (!targets.length && typeof ctx?.getControl === "function" && attrName) {
+      try {
+        const control = ctx.getControl(attrName);
+        if (control && typeof control.getEntityTypes === "function") {
+          const t = control.getEntityTypes();
+          if (Array.isArray(t)) targets = targets.concat(t);
+        }
+      } catch {
+        // no-op
+      }
+    }
+
+    return Array.from(new Set(targets.filter(Boolean)));
+  }
+
+  async function getEntityMetadata(entityLogicalName) {
+    if (entityMetadataCache.has(entityLogicalName)) {
+      return entityMetadataCache.get(entityLogicalName);
+    }
+
+    let metadata = null;
+    if (window.Xrm?.Utility?.getEntityMetadata) {
+      try {
+        const result = await window.Xrm.Utility.getEntityMetadata(entityLogicalName);
+        metadata = {
+          primaryIdAttribute: result?.PrimaryIdAttribute || "",
+          primaryNameAttribute: result?.PrimaryNameAttribute || ""
+        };
+      } catch {
+        metadata = null;
+      }
+    }
+
+    if (!metadata?.primaryIdAttribute) {
+      metadata = {
+        primaryIdAttribute: `${entityLogicalName}id`,
+        primaryNameAttribute: "name"
+      };
+    }
+
+    entityMetadataCache.set(entityLogicalName, metadata);
+    return metadata;
+  }
+
+  function buildLookupFetchXml(entityName, idAttr, nameAttr, activeOnly) {
+    const nameAttribute = nameAttr
+      ? `<attribute name="${xmlEscape(nameAttr)}" />`
+      : "";
+    const stateFilter = activeOnly
+      ? "<filter><condition attribute='statecode' operator='eq' value='0' /></filter>"
+      : "";
+
+    return `<fetch top='1'><entity name='${xmlEscape(entityName)}'><attribute name='${xmlEscape(idAttr)}' />${nameAttribute}${stateFilter}</entity></fetch>`;
+  }
+
+  async function retrieveByFetchXml(entityLogicalName, fetchXml) {
+    if (!window.Xrm?.WebApi?.retrieveMultipleRecords) {
+      return { entities: [] };
+    }
+
+    try {
+      const query = `?fetchXml=${encodeURIComponent(fetchXml)}`;
+      return await window.Xrm.WebApi.retrieveMultipleRecords(entityLogicalName, query);
+    } catch {
+      return { entities: [] };
+    }
+  }
+
+  function formatGuidForLookup(id) {
+    const raw = String(id || "").trim().replace(/[{}]/g, "");
+    return raw ? `{${raw}}` : "";
+  }
+
+  function resolveCurrentUserOwnerLookup() {
+    const gc = window.Xrm?.Utility?.getGlobalContext?.();
+    const userSettings = gc?.userSettings;
+    if (!userSettings?.userId) {
+      return null;
+    }
+
+    const id = formatGuidForLookup(userSettings.userId);
+    const name = String(userSettings.userName || "");
+    return [{ id, name, entityType: "systemuser" }];
+  }
+
+  function xmlEscape(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;");
   }
 
   function getFormContext() {

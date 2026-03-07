@@ -51,6 +51,7 @@ function buildPrompt(payload) {
   return [
     "You generate realistic sample form values for a Microsoft Dataverse form.",
     "Return strict JSON only.",
+    "Do not include markdown, code fences, comments, or explanatory text.",
     "Format: {\"values\": {\"<fieldKey>\": \"<value>\"}}.",
     "Use field key priority: id if present, otherwise name.",
     `Entity logical name: ${entityName || "unknown"}`,
@@ -186,22 +187,68 @@ function extractAssistantText(data) {
 }
 
 function parseAiJson(content) {
-  const trimmed = content.trim();
-  const withoutFence = trimmed
-    .replace(/^```json\s*/i, "")
-    .replace(/^```\s*/i, "")
-    .replace(/\s*```$/, "");
-
-  let parsed;
-  try {
-    parsed = JSON.parse(withoutFence);
-  } catch {
-    throw new Error("AI response was not valid JSON.");
-  }
+  const parsed = parseJsonWithFallback(content);
 
   if (!parsed?.values || typeof parsed.values !== "object") {
     throw new Error("AI JSON must contain a 'values' object.");
   }
 
   return parsed.values;
+}
+
+function parseJsonWithFallback(content) {
+  const trimmed = String(content || "").trim();
+  const withoutFence = trimmed
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/, "");
+
+  try {
+    return JSON.parse(withoutFence);
+  } catch {
+    const candidate = extractFirstJsonObject(withoutFence);
+    if (!candidate) {
+      throw new Error("AI response was not valid JSON.");
+    }
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      throw new Error("AI response was not valid JSON.");
+    }
+  }
+}
+
+function extractFirstJsonObject(text) {
+  const start = text.indexOf("{");
+  if (start < 0) return "";
+
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  for (let i = start; i < text.length; i += 1) {
+    const ch = text[i];
+    if (inString) {
+      if (escape) {
+        escape = false;
+      } else if (ch === "\\") {
+        escape = true;
+      } else if (ch === "\"") {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (ch === "\"") {
+      inString = true;
+      continue;
+    }
+
+    if (ch === "{") depth += 1;
+    if (ch === "}") depth -= 1;
+
+    if (depth === 0) {
+      return text.slice(start, i + 1);
+    }
+  }
+  return "";
 }

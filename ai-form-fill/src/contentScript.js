@@ -113,11 +113,12 @@ function callBridge(type, payload) {
     const requestId = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const responseEvent = "DATAVERSE_BRIDGE_RESPONSE";
     const requestEvent = "DATAVERSE_BRIDGE_REQUEST";
+    const timeoutMs = type === "APPLY_VALUES" ? 45000 : 10000;
 
     const timeout = setTimeout(() => {
       window.removeEventListener(responseEvent, onResponse);
-      reject(new Error("Dataverse bridge request timed out."));
-    }, 5000);
+      reject(new Error(`Dataverse bridge request timed out (${type} after ${timeoutMs}ms).`));
+    }, timeoutMs);
 
     function onResponse(event) {
       const detail = event.detail || {};
