@@ -72,7 +72,7 @@ menuDisclaimerBtnEl.addEventListener("click", async () => {
       height: 220
     });
   } catch (error) {
-    setStatus("This is AI generated content. Please review before using.");
+    setStatus("An AI copilot has been used in generating lot of code. Please review before using.");
   }
 });
 
