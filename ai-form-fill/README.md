@@ -34,13 +34,22 @@ Edge extension to autofill Microsoft Dataverse forms using OpenAI or Azure AI Fo
 ## Manual Installation (Edge)
 
 1. Download installation zip file from https://github.com/shashankgwl/CRMGenDev/blob/main/ai-form-fill/manual-installation/ai-form-fill.zip
-2. Open Edge and go to `edge://extensions`.
-3. 
-4. Turn on `Developer mode`.
-5. Click `Load unpacked`.
-6. Select this repository folder:
-   - `.../ai-form-fill`
-7. Confirm the extension appears in the list.
+2. Unzip in a folder.
+3. Open Edge and go to `edge://extensions`.
+4. 
+5. Turn on `Developer mode`.
+6. Click `Load unpacked`.
+   <img width="1136" height="323" alt="image" src="https://github.com/user-attachments/assets/39106378-e9e4-4442-beb4-10c584d2b566" />
+
+8. Select the unzipped folder which contains the manifest and src.
+
+   
+   <img width="430" height="345" alt="image" src="https://github.com/user-attachments/assets/8f1f3d8c-0901-48c7-9845-92dd725db3a0" />
+
+10. Confirm the extension appears in the list.
+
+    <img width="1071" height="215" alt="image" src="https://github.com/user-attachments/assets/366c4e4b-d7f6-41bb-9a77-ac13143613a6" />
+
 
 ## Initial Setup
 
