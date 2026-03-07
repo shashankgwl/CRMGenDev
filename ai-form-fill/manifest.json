@@ -3,6 +3,12 @@
   "name": "Dataverse AI Autofill",
   "version": "0.1.0",
   "description": "Autofill Dataverse forms using OpenAI or Azure AI Foundry endpoints.",
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
   "permissions": [
     "storage",
     "activeTab",
@@ -30,6 +36,11 @@
     }
   ],
   "action": {
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png"
+    },
     "default_popup": "src/popup.html",
     "default_title": "Dataverse AI Autofill"
   },
