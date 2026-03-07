@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Dataverse AI Autofill icon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f6cbd"/>
+      <stop offset="100%" stop-color="#114a8b"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98"/>
+      <stop offset="100%" stop-color="#d9ecff" stop-opacity="0.95"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0a2f57" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect x="24" y="24" width="464" height="464" rx="110" fill="url(#bg)"/>
+
+  <g filter="url(#shadow)">
+    <ellipse cx="230" cy="190" rx="120" ry="42" fill="url(#plate)"/>
+    <path d="M110 190v90c0 23 54 42 120 42s120-19 120-42v-90" fill="url(#plate)"/>
+    <ellipse cx="230" cy="280" rx="120" ry="42" fill="#c7e1fb"/>
+    <path d="M110 280v84c0 23 54 42 120 42s120-19 120-42v-84" fill="#e8f4ff"/>
+    <ellipse cx="230" cy="364" rx="120" ry="42" fill="#b8d8f7"/>
+  </g>
+
+  <g transform="translate(312 154)" filter="url(#shadow)">
+    <circle cx="74" cy="74" r="74" fill="#ffffff"/>
+    <path d="M74 30l10 24 24 10-24 10-10 24-10-24-24-10 24-10z" fill="#0f6cbd"/>
+    <path d="M108 102l6 14 14 6-14 6-6 14-6-14-14-6 14-6z" fill="#37a0f4"/>
+    <circle cx="46" cy="112" r="10" fill="#5eb3f7"/>
+  </g>
+
+  <path d="M165 154c20-14 52-22 88-22s68 8 88 22" fill="none" stroke="#eaf4ff" stroke-width="10" stroke-linecap="round" opacity="0.8"/>
+</svg>
