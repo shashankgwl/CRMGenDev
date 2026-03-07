@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dataverse AI Autofill</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <header class="topbar">
+        <h1>Dataverse AI Autofill</h1>
+        <div class="menu-wrap">
+          <button id="settingsToggle" class="icon-btn" type="button" title="Menu" aria-label="Menu">&#9881;</button>
+          <div id="gearMenu" class="gear-menu hidden" role="menu" aria-hidden="true">
+            <button id="menuSettingsBtn" class="menu-item" type="button" role="menuitem">Settings</button>
+            <button id="menuDisclaimerBtn" class="menu-item" type="button" role="menuitem">Disclaimer</button>
+          </div>
+        </div>
+      </header>
+
+      <label for="context">Context prompt</label>
+      <textarea id="context" rows="4" placeholder="Example: UK B2B manufacturing lead data"></textarea>
+
+      <label class="check-row" for="fillLockedFields">
+        <input id="fillLockedFields" type="checkbox" />
+        Fill locked fields
+      </label>
+
+      <button id="autofillBtn">Autofill current Dataverse page</button>
+      <p id="status"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

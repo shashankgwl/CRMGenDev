@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dataverse AI Autofill Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Dataverse AI Autofill Settings</h1>
+
+      <section>
+        <label for="provider">Provider</label>
+        <select id="provider">
+          <option value="openai">OpenAI</option>
+          <option value="azure">Azure AI Foundry / Azure OpenAI</option>
+        </select>
+      </section>
+
+      <section>
+        <h2>OpenAI</h2>
+        <label for="openaiApiKey">API key</label>
+        <input id="openaiApiKey" type="password" />
+
+        <label for="openaiModel">Model</label>
+        <input id="openaiModel" type="text" placeholder="gpt-4o-mini" />
+
+        <label for="openaiBaseUrl">Chat completions URL</label>
+        <input id="openaiBaseUrl" type="text" />
+      </section>
+
+      <section>
+        <h2>Azure</h2>
+        <label for="azureEndpoint">Endpoint</label>
+        <input id="azureEndpoint" type="text" placeholder="https://YOUR-RESOURCE.openai.azure.com" />
+
+        <label for="azureModel">Model</label>
+        <input id="azureModel" type="text" placeholder="gpt-5.1" />
+
+        <label for="azureApiKey">API key</label>
+        <input id="azureApiKey" type="password" />
+      </section>
+
+      <section>
+        <h2>Autofill Behavior</h2>
+        <label for="fillLockedFields">
+          <input id="fillLockedFields" type="checkbox" />
+          Fill locked fields (disabled/read-only controls)
+        </label>
+      </section>
+
+      <button id="saveBtn">Save settings</button>
+      <p id="status"></p>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>

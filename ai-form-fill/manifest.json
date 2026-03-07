@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Dataverse AI Autofill",
+  "version": "0.1.0",
+  "description": "Autofill Dataverse forms using OpenAI or Azure AI Foundry endpoints.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.dynamics.com/*",
+    "https://*.powerapps.com/*",
+    "https://api.openai.com/*",
+    "https://*.openai.azure.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.dynamics.com/*",
+        "https://*.powerapps.com/*"
+      ],
+      "js": [
+        "src/contentScript.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_title": "Dataverse AI Autofill"
+  },
+  "options_page": "src/options.html",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/dataverseBridge.js"
+      ],
+      "matches": [
+        "https://*.dynamics.com/*",
+        "https://*.powerapps.com/*"
+      ]
+    }
+  ]
+}
