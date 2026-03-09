@@ -23,10 +23,14 @@ Edge extension to autofill Microsoft Dataverse forms using Azure AI Foundry depl
 2. Unzip in a folder.
 3. Open Edge and go to `edge://extensions`.
 4. Turn on `Developer mode`.
-5. Click `Load unpacked`.
+   
+   <img width="357" height="499" alt="image" src="https://github.com/user-attachments/assets/99c17c3a-0a85-4271-a635-8776edeade78" />
+   
+
+6. Click `Load unpacked`.
    <img width="1136" height="323" alt="image" src="https://github.com/user-attachments/assets/39106378-e9e4-4442-beb4-10c584d2b566" />
 
-6. Select the unzipped folder which contains the manifest and src.
+7. Select the unzipped folder which contains the manifest and src.
    <img width="1037" height="332" alt="image" src="https://github.com/user-attachments/assets/ce01bd27-4c7f-4919-90cb-ff704d5a3511" />
 
 
