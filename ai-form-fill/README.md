@@ -8,6 +8,7 @@ Edge extension to autofill Microsoft Dataverse forms using Azure AI Foundry depl
 - Uses Dataverse Xrm form APIs for field discovery and value application (with DOM fallback).
 - Skips field-level-security blocked fields.
 - Optional checkbox to fill locked fields.
+- Optional checkbox to fill lookup fields (slower).
 - Random fallback for empty optionset fields.
 
 ## Prerequisites
@@ -61,8 +62,9 @@ Note: Azure requests are sent using the Responses API.
 2. Open the extension popup.
 3. Optional: enter context text (business scenario or data style).
 4. Optional: check/uncheck `Fill locked fields`.
-5. Click `Autofill current Dataverse page`.
-6. Review the values before saving the record.
+5. Optional: check/uncheck `Fill lookup fields` (enabling this can add delay).
+6. Click `Autofill current Dataverse page`.
+7. Review the values before saving the record.
 
 
 ## Troubleshooting

@@ -4,7 +4,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   runAutofill(message.context, {
-    fillLockedFields: Boolean(message.fillLockedFields)
+    fillLockedFields: Boolean(message.fillLockedFields),
+    fillLookupFields: Boolean(message.fillLookupFields)
   })
     .then((result) => sendResponse({ ok: true, result }))
     .catch((error) => sendResponse({ ok: false, error: error.message }));

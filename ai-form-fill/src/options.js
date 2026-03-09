@@ -2,7 +2,8 @@ const DEFAULT_CONFIG = {
   azureApiKey: "",
   azureEndpoint: "",
   azureModel: "gpt-5.1",
-  fillLockedFields: false
+  fillLockedFields: false,
+  fillLookupFields: false
 };
 
 const statusEl = document.getElementById("status");
@@ -12,7 +13,8 @@ const fields = {
   azureApiKey: document.getElementById("azureApiKey"),
   azureEndpoint: document.getElementById("azureEndpoint"),
   azureModel: document.getElementById("azureModel"),
-  fillLockedFields: document.getElementById("fillLockedFields")
+  fillLockedFields: document.getElementById("fillLockedFields"),
+  fillLookupFields: document.getElementById("fillLookupFields")
 };
 
 init().catch((error) => setStatus(error.message));

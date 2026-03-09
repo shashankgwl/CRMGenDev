@@ -2,7 +2,8 @@ const DEFAULT_CONFIG = {
   azureApiKey: "",
   azureEndpoint: "",
   azureModel: "gpt-5.1",
-  fillLockedFields: false
+  fillLockedFields: false,
+  fillLookupFields: false
 };
 const AZURE_RESPONSES_API_VERSION = "2025-04-01-preview";
 

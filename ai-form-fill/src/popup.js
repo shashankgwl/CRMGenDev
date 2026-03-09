@@ -6,6 +6,7 @@ const gearMenuEl = document.getElementById("gearMenu");
 const menuSettingsBtnEl = document.getElementById("menuSettingsBtn");
 const menuDisclaimerBtnEl = document.getElementById("menuDisclaimerBtn");
 const fillLockedFieldsEl = document.getElementById("fillLockedFields");
+const fillLookupFieldsEl = document.getElementById("fillLookupFields");
 
 init().catch((error) => setStatus(error.message));
 
@@ -23,12 +24,14 @@ autofillBtn.addEventListener("click", async () => {
     }
 
     const fillLockedFields = fillLockedFieldsEl.checked;
-    await chrome.storage.sync.set({ fillLockedFields });
+    const fillLookupFields = fillLookupFieldsEl.checked;
+    await chrome.storage.sync.set({ fillLockedFields, fillLookupFields });
 
     const response = await sendAutofillMessage(
       tab.id,
       contextEl.value.trim(),
-      fillLockedFields
+      fillLockedFields,
+      fillLookupFields
     );
 
     if (!response?.ok) {
@@ -84,11 +87,12 @@ function setStatus(message) {
   statusEl.textContent = message;
 }
 
-async function sendAutofillMessage(tabId, context, fillLockedFields) {
+async function sendAutofillMessage(tabId, context, fillLockedFields, fillLookupFields) {
   const message = {
     type: "RUN_AUTOFILL",
     context,
-    fillLockedFields
+    fillLockedFields,
+    fillLookupFields
   };
 
   try {
@@ -128,6 +132,7 @@ function closeGearMenu() {
 }
 
 async function init() {
-  const config = await chrome.storage.sync.get(["fillLockedFields"]);
+  const config = await chrome.storage.sync.get(["fillLockedFields", "fillLookupFields"]);
   fillLockedFieldsEl.checked = Boolean(config.fillLockedFields);
+  fillLookupFieldsEl.checked = Boolean(config.fillLookupFields);
 }

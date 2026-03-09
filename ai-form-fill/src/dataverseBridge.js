@@ -141,6 +141,7 @@
       throw new Error("Xrm form context was not found on this page.");
     }
     const includeLockedFields = Boolean(options && options.fillLockedFields);
+    const includeLookupFields = Boolean(options && options.fillLookupFields);
     const processedKeys = new Set();
 
     const updates = [];
@@ -167,7 +168,12 @@
       }
 
       const type = typeof attr.getAttributeType === "function" ? attr.getAttributeType() : "unknown";
-      if (String(key).toLowerCase() === "ownerid") {
+      if (["lookup", "customer", "owner"].includes(type) && !includeLookupFields) {
+        debugFieldDecision(key, access.disabled, access.canUpdate, "skipped:lookup_autofill_disabled");
+        skipped.push({ key, reason: "lookup_autofill_disabled", type });
+        continue;
+      }
+      if (String(key).toLowerCase() === "ownerid" && includeLookupFields) {
         const ownerLookup = resolveCurrentUserOwnerLookup();
         if (!ownerLookup) {
           debugFieldDecision(key, access.disabled, access.canUpdate, "skipped:owner_resolution_failed");
