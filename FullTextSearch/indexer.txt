@@ -1,0 +1,26 @@
+{
+  "@odata.context": "https://shankyaisearch.search.windows.net/$metadata#indexers/$entity",
+  "@odata.etag": "\"0x8DE8D9F9E9B590A\"",
+  "name": "indexer-with-page-numbers",
+  "description": null,
+  "dataSourceName": "azureblob-1774784091156-datasource",
+  "skillsetName": "pdf-page-skillset",
+  "targetIndexName": "pdf-index-withpage-v2",
+  "disabled": null,
+  "schedule": null,
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": null,
+    "maxFailedItemsPerBatch": null,
+    "configuration": {
+      "dataToExtract": "contentAndMetadata",
+      "indexedFileNameExtensions": ".pdf,.doc",
+      "parsingMode": "default",
+      "allowSkillsetToReadFileData": true
+    }
+  },
+  "fieldMappings": [],
+  "outputFieldMappings": [],
+  "cache": null,
+  "encryptionKey": null
+}

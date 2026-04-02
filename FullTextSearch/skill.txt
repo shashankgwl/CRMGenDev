@@ -1,0 +1,78 @@
+{
+  "@odata.etag": "\"0x8DE8D9E9AE9F854\"",
+  "name": "pdf-page-skillset",
+  "description": "Extract page-aware text sections from PDFs",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Util.DocumentIntelligenceLayoutSkill",
+      "name": "layout-skill",
+      "description": "Extract page-aware text sections from the PDF",
+      "context": "/document",
+      "outputMode": "oneToMany",
+      "outputFormat": "text",
+      "extractionOptions": [
+        "locationMetadata"
+      ],
+      "inputs": [
+        {
+          "name": "file_data",
+          "source": "/document/file_data",
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text_sections",
+          "targetName": "text_sections"
+        }
+      ]
+    }
+  ],
+  "cognitiveServices": {
+    "@odata.type": "#Microsoft.Azure.Search.DefaultCognitiveServices"
+  },
+  "indexProjections": {
+    "selectors": [
+      {
+        "targetIndexName": "pdf-index-withpage-v2",
+        "parentKeyFieldName": "text_parent_id",
+        "sourceContext": "/document/text_sections/*",
+        "mappings": [
+          {
+            "name": "content",
+            "source": "/document/text_sections/*/content",
+            "inputs": []
+          },
+          {
+            "name": "chunk",
+            "source": "/document/text_sections/*/content",
+            "inputs": []
+          },
+          {
+            "name": "pageNumber",
+            "source": "/document/text_sections/*/locationMetadata/pageNumber",
+            "inputs": []
+          },
+          {
+            "name": "ordinalPosition",
+            "source": "/document/text_sections/*/locationMetadata/ordinalPosition",
+            "inputs": []
+          },
+          {
+            "name": "title",
+            "source": "/document/metadata_storage_name",
+            "inputs": []
+          },
+          {
+            "name": "metadata_storage_path",
+            "source": "/document/metadata_storage_path",
+            "inputs": []
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "projectionMode": "skipIndexingParentDocuments"
+    }
+  }
+}
