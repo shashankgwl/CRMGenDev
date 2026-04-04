@@ -1,0 +1,5 @@
+{
+  "siteName": "Blog Portals SPA",
+  "defaultLandingPage": "index.html",
+  "compiledPath": "dist"
+}
