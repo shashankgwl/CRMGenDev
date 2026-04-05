@@ -56,7 +56,7 @@ function App() {
                 <span className="brand-title">Northstar Leadership</span>
               </Link>
               <nav className="header-nav">
-                <Link to="/">Home</Link>
+                <Link to="/">Northstar Leadership</Link>
                 <Link to="/articles">Explore Articles</Link>
                 <Link to="/videos">Videos</Link>
                 <Link to="/about">About me</Link>
