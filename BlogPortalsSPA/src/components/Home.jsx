@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PrimaryButton, DocumentCard, DocumentCardTitle, DocumentCardDetails, Image, Text } from '@fluentui/react';
+import { DocumentCard, DocumentCardTitle, DocumentCardDetails, Image, Text } from '@fluentui/react';
 import { fetchArticles } from '../services/api';
 
-const topicCards = [
+const videoCards = [
   {
-    title: 'Power Platform Insights',
-    description: 'Dive deep into tutorials and best practices for building powerful business solutions.',
+    title: 'Power Platform and CRM Sessions',
+    description: 'Short, practical videos on Power Platform and Dynamics CRM implementation topics.',
     image: 'https://images.unsplash.com/photo-1581092919535-7146ff1a5901?auto=format&fit=crop&w=900&q=80'
   },
   {
-    title: 'Azure Cloud Expertise',
-    description: 'Stay updated with the latest Azure services, architecture patterns, and cloud development strategies.',
+    title: 'Cloud and Engineering Talks',
+    description: 'Azure architecture, integration patterns, and engineering playbooks in an easy-to-follow format.',
     image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80'
   },
   {
-    title: 'Engineering Practices',
-    description: 'Learn practical approaches for modern software delivery, quality, and scalable systems.',
+    title: 'Leadership and Mentorship Conversations',
+    description: 'Insights from leaders and mentors on growth, coaching, and career acceleration.',
     image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=900&q=80'
   }
 ];
@@ -40,54 +40,16 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      <section className="home-hero" id="resources">
+      <section className="home-hero">
         <div className="hero-overlay">
-          <Text variant="superLarge" className="hero-title">Welcome to ArticleHub</Text>
-          <Text variant="xLarge" className="hero-subtitle">
-            Your source for expert technical articles on Power Platform, Azure, C#, JavaScript, and modern engineering practices
-          </Text>
-          <Link to="/articles" className="unstyled-link">
-            <PrimaryButton text="Explore Articles" className="hero-cta" />
-          </Link>
-        </div>
-      </section>
-
-      <section className="home-content-wrap">
-        <div className="featured-grid">
-          {featured.map((article) => (
-            <DocumentCard key={article.id} className="feature-card">
-              {article.image && (
-                <Image src={article.image} alt={article.title} width="100%" height={260} imageFit="cover" />
-              )}
-              <DocumentCardDetails className="feature-details">
-                <DocumentCardTitle title={article.title} />
-                <Text variant="medium" className="feature-description">
-                  {article.content.replace(/<[^>]*>/g, '').slice(0, 140)}...
-                </Text>
-                <Link to={`/article/${article.id}`} className="unstyled-link">
-                  <PrimaryButton text="Read More" className="section-cta" />
-                </Link>
-              </DocumentCardDetails>
-            </DocumentCard>
-          ))}
-        </div>
-
-        <div className="topic-grid">
-          {topicCards.map((topic) => (
-            <article key={topic.title} className="topic-card">
-              <img src={topic.image} alt={topic.title} className="topic-image" />
-              <h3 className="topic-title">{topic.title}</h3>
-              <p className="topic-description">{topic.description}</p>
-            </article>
-          ))}
-        </div>
-
-        <div className="home-actions" id="contact">
-          <Text variant="large" className="section-title">Latest Articles</Text>
-          <Text variant="medium" className="section-subtitle">{articles.length} published stories</Text>
-          <Link to="/articles" className="unstyled-link">
-            <PrimaryButton text="View All Articles" className="section-cta" />
-          </Link>
+          <Text variant="superLarge" className="hero-title">Welcome to Northstart Leadership</Text>
+          <p className="hero-intro">Your one stop hub for</p>
+          <ul className="hero-points">
+            <li>Technical articles ranging from Power Platform, Dynamics CRM, Azure, C#, .NET</li>
+            <li>Leadership coaching</li>
+            <li>Mentorship (Be a mentor or get mentored)</li>
+            <li>Voice of leaders (Hear from the industry leaders and community champions)</li>
+          </ul>
         </div>
       </section>
     </div>

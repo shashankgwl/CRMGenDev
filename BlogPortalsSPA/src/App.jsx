@@ -5,6 +5,9 @@ import Home from './components/Home';
 import ArticleList from './components/ArticleList';
 import ArticleView from './components/ArticleView';
 import ArticleForm from './components/ArticleForm';
+import Videos from './components/Videos';
+import About from './components/About';
+import Contact from './components/Contact';
 import Footer from './components/Footer';
 import './App.css';
 
@@ -39,38 +42,45 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <div className="top-strip">
-          <div className="strip-inner">
-            <AuthButton />
+        <div className="app-layout">
+          <div className="top-strip">
+            <div className="strip-inner">
+              <AuthButton />
+            </div>
           </div>
-        </div>
 
-        <header className="app-header">
-          <div className="header-inner">
-            <Link to="/" className="brand-link">
-              <span className="brand-mark" />
-              <span className="brand-title">Northstar leadership</span>
-            </Link>
-            <nav className="header-nav">
-              <Link to="/">Home</Link>
-              <a href="#contact">Contact Us</a>
-              <Link to="/articles">Resources</Link>
-            </nav>
+          <header className="app-header">
+            <div className="header-inner">
+              <Link to="/" className="brand-link">
+                <span className="brand-mark" />
+                <span className="brand-title">Northstar Leadership</span>
+              </Link>
+              <nav className="header-nav">
+                <Link to="/">Home</Link>
+                <Link to="/articles">Explore Articles</Link>
+                <Link to="/videos">Videos</Link>
+                <Link to="/about">About me</Link>
+                <Link to="/contact">Contact Us</Link>
+              </nav>
+            </div>
+          </header>
+
+          <div className="site-shell">
+            <main className="app-main">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/articles" element={<ArticleList />} />
+                <Route path="/article/:id" element={<ArticleView />} />
+                <Route path="/create" element={<ArticleForm />} />
+                <Route path="/edit/:id" element={<ArticleForm />} />
+                <Route path="/videos" element={<Videos />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+              </Routes>
+            </main>
           </div>
-        </header>
-
-        <div className="site-shell">
-          <main className="app-main">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/articles" element={<ArticleList />} />
-              <Route path="/article/:id" element={<ArticleView />} />
-              <Route path="/create" element={<ArticleForm />} />
-              <Route path="/edit/:id" element={<ArticleForm />} />
-            </Routes>
-          </main>
+          <Footer />
         </div>
-        <Footer />
       </Router>
     </ThemeProvider>
   );
