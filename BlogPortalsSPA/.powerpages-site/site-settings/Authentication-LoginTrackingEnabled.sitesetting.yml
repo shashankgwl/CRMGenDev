@@ -1,4 +1,4 @@
 description: A true or false value. If set to true, the Last Successful Login field on the portal user’s contact will be updated with the date and time when they successfully signed in.
-id: d51f09c7-60bc-4b1d-9a6c-2a27089872b9
+id: 5df98e58-dd5a-42f0-8dda-d5d922c66e7c
 name: Authentication/LoginTrackingEnabled
 value: False

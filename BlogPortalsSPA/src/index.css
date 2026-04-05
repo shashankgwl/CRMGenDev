@@ -14,3 +14,262 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* LinkedIn Container */
+.about-page {
+  width: 100%;
+  padding: 1.5rem 1rem 2.5rem;
+  background: #f3f2ef;
+}
+
+.linkedin-container {
+  width: min(1140px, calc(100vw - 2rem));
+  margin: 0 auto;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: "Segoe UI", Arial, sans-serif;
+  border: 1px solid #e0dfdc;
+  box-shadow: none;
+}
+
+/* Banner */
+.banner {
+  height: 210px;
+  position: relative;
+  background: #d9d9d9;
+  z-index: 1;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.camera-icon {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* Profile Layout */
+.profile-wrapper {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2rem;
+  padding: 0 1.5rem 1.4rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Left Section */
+.profile-left {
+  display: flex;
+  gap: 1rem;
+  min-width: 0;
+  position: relative;
+}
+
+.profile-pic {
+  width: 158px;
+  height: 158px;
+  border-radius: 50%;
+  margin-top: -56px;
+  border: 5px solid white;
+  object-fit: cover;
+  object-position: center;
+  flex-shrink: 0;
+  image-rendering: auto;
+  box-shadow: 0 0 0 1px #d9d9d9;
+  position: relative;
+  z-index: 3;
+}
+
+.profile-pic-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8edf3;
+  color: #2a4e86;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* Details */
+.profile-details {
+  min-width: 0;
+}
+
+.profile-details h1 {
+  margin: 1rem 0 0;
+  font-size: 2rem;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.badge {
+  color: #0a66c2;
+}
+
+.pronouns {
+  font-size: 1rem;
+  color: #6a6f73;
+  font-weight: 600;
+}
+
+.headline {
+  margin-top: 0.55rem;
+  margin-bottom: 0.55rem;
+  color: #1f2328;
+  max-width: 760px;
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.location {
+  color: #6a6f73;
+  font-size: 1rem;
+  margin-top: 0.15rem;
+  margin-bottom: 0.4rem;
+}
+
+.link {
+  color: #0a66c2;
+  cursor: pointer;
+}
+
+.connections {
+  color: #0a66c2;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  margin-bottom: 0.9rem;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.action-btn {
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.94rem;
+  padding: 0.48rem 0.95rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.action-btn-primary {
+  background: #0a66c2;
+  color: #fff;
+  text-decoration: none;
+}
+
+.action-btn-light {
+  background: #fff;
+  color: #0a66c2;
+  border-color: #0a66c2;
+}
+
+.linkedin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.linkedin-icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* Right Section */
+.profile-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+  min-width: 290px;
+  padding-right: 0.4rem;
+}
+
+.company {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+.purple {
+  background: #6a1b9a;
+}
+
+.red {
+  background: #d32f2f;
+}
+
+.company-logo-img {
+  background: #fff;
+  border: 1px solid #d0d7de;
+  object-fit: contain;
+  padding: 2px;
+}
+
+@media (max-width: 920px) {
+  .about-page {
+    padding: 1rem 0.65rem 1.8rem;
+  }
+
+  .profile-wrapper {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-right {
+    margin-top: 0;
+    min-width: 0;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .banner {
+    height: 150px;
+  }
+
+  .profile-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .profile-pic {
+    margin-top: -44px;
+    width: 116px;
+    height: 116px;
+  }
+
+  .profile-details h1 {
+    font-size: 1.5rem;
+  }
+}

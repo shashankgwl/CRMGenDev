@@ -1,0 +1,17 @@
+- adx_disablepagevalidation: false
+  adx_displayimageonly: false
+  adx_displayorder: 1
+  adx_displaypagechildlinks: false
+  adx_name: Home
+  adx_openinnewwindow: false
+  adx_pageid: f9752aee-3814-49a0-b9ea-aac3f2febcbe
+  adx_publishingstateid: e8335192-a823-4797-93a8-8691b01799bd
+  adx_robotsfollowlink: true
+  adx_weblinkid: a15b335f-50e9-4d77-b479-678a555fa176
+  adx_weblinksetid: 27309267-5cf3-46cb-a8dc-48bbd57d1178
+- adx_displayorder: 2
+  adx_name: assets
+  adx_pageid: 63db11db-1939-478c-8843-d88aa3eb8a0b
+  adx_publishingstateid: e8335192-a823-4797-93a8-8691b01799bd
+  adx_weblinkid: e3fabdfc-a46a-445a-b6f2-7f96f39e5eca
+  adx_weblinksetid: 27309267-5cf3-46cb-a8dc-48bbd57d1178
