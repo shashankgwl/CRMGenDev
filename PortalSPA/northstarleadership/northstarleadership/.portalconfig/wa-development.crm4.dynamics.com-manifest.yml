@@ -332,7 +332,7 @@ adx_webfile:
   IsDeleted: false
 - RecordId: 5f3dd62c-113b-4772-9d6e-0ee98f50a6be
   DisplayName: index-TmZg-4RF.js
-  CheckSum: 05859c4e94ea7480321f1e6cf6ff501e002fd6eba4bd8e5d93c757661cc09d0f
+  CheckSum: a73f40829ceaed5e3c6219f1bc5e655b1ea14fef840e033a2cf19724c8861fc4
   IsDeleted: false
 - RecordId: df6504df-42d7-46a6-8d92-0935d30af08d
   DisplayName: index.html
@@ -529,7 +529,7 @@ annotation:
 - RecordId: 3421ef88-d530-f111-88b3-000d3a2dfe97
   DisplayName: index-TmZg-4RF.js
   CheckSum: 3d4d99f80dc5ece025a73f63fa54f13be5f87550a44526c1f0961175ccb5f8df
-  IsDeleted: false
+  IsDeleted: true
 - RecordId: 53269685-d530-f111-88b3-7c1e5227ba83
   DisplayName: theme.css
   CheckSum: 2c122ce9f95d85edd7f794148b72786ea977b169b3daf90bb8dc53bcfb2d9f5c
@@ -541,6 +541,10 @@ annotation:
 - RecordId: 6dde858a-d530-f111-88b4-6045bd9a58de
   DisplayName: bootstrap.min.css
   CheckSum: c82090fcdfc5502f64a7abf0aa84c6437d731f1b660cc8e426a7d9010c625d2b
+  IsDeleted: false
+- RecordId: b2ff6be5-1931-f111-88b3-000d3a2dfe97
+  DisplayName: index-TmZg-4RF.js
+  CheckSum: d68710fcd46bd2dbc87559f34aa56701cfb4831403f5942a8c61ff72ff17d894
   IsDeleted: false
 - RecordId: fabd6e8c-d530-f111-88b3-7c1e5227ba83
   DisplayName: index.html

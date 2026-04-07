@@ -2,11 +2,11 @@ enablerating: false
 enabletracking: false
 excludefromsearch: false
 hiddenfromsitemap: true
-id: 21a3c9df-3d04-480c-b079-44cae2629556
+id: 3ac8660b-3417-47b7-91e7-72a540d1bf7c
 isroot: true
 name: Search
-pagetemplateid: b8bf177e-1000-49b7-833c-56928207a935
-parentpageid: 328ee5ee-9e97-45cd-a2ed-9e832e14d59c
+pagetemplateid: 80566e6a-f284-4f7b-b0f8-60b07e7313ce
+parentpageid: 949f35e0-ec0e-45d9-8dc1-2fd2efbbc3df
 partialurl: search
-publishingstateid: 66277a38-0d0a-49a2-a1ef-c36be43fac86
+publishingstateid: 2641fc90-c572-4006-a5ea-4580c1db2a68
 sharedpageconfiguration: false

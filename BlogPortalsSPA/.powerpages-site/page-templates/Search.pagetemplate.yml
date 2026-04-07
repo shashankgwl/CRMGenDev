@@ -1,7 +1,7 @@
 entityname: adx_webpage
-id: b8bf177e-1000-49b7-833c-56928207a935
+id: 80566e6a-f284-4f7b-b0f8-60b07e7313ce
 isdefault: false
 name: Search
 rewriteurl: ~/Pages/Search.aspx
 usewebsiteheaderandfooter: true
-webtemplateid: 6c92d549-a768-46c8-a6b1-df96ea68e45a
+webtemplateid: a61b11fb-f626-4e93-a025-9c4921fc96b1

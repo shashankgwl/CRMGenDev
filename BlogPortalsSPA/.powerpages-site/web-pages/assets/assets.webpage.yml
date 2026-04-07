@@ -4,12 +4,12 @@ enabletracking: false
 excludefromsearch: false
 feedbackpolicy: 756150000
 hiddenfromsitemap: false
-id: 385c8095-78af-4c83-8358-3c0f1125493c
+id: e32b4e27-9790-4456-9d99-9685762eb9d5
 isroot: true
 name: assets
-pagetemplateid: 8f2208fd-730e-4519-b2c1-d77ca8cf4753
-parentpageid: 328ee5ee-9e97-45cd-a2ed-9e832e14d59c
+pagetemplateid: ae945185-eaa8-4e5a-95c7-47ee46703ae0
+parentpageid: 949f35e0-ec0e-45d9-8dc1-2fd2efbbc3df
 partialurl: assets
-publishingstateid: 66277a38-0d0a-49a2-a1ef-c36be43fac86
+publishingstateid: 2641fc90-c572-4006-a5ea-4580c1db2a68
 sharedpageconfiguration: false
 title: assets

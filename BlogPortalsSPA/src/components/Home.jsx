@@ -42,7 +42,7 @@ const Home = () => {
     <div className="home-page">
       <section className="home-hero">
         <div className="hero-overlay">
-          <Text variant="superLarge" className="hero-title">Welcome to Northstar Leadership Portal</Text>
+          <Text variant="superLarge" className="hero-title">Northstar Leadership Portal</Text>
           <p className="hero-intro">Your one stop hub for</p>
           <ul className="hero-points">
             <li>Technical articles ranging from Power Platform, Dynamics CRM, Azure, C#, .NET</li>
