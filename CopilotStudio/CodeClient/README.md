@@ -1,6 +1,6 @@
 # Copilot Studio Console Client
 
-This .NET console app connects to the published Copilot Studio agent `cr0b4_bilingualPoemCreator` in environment `Default-162b57d1-22cf-4a6e-b7a3-4d742c2ae518`.
+This .NET console app connects to a published Copilot Studio agent, such as `cr0b4_bilingualPoemCreator`, by using the agent's environment ID and schema name.
 
 The client follows the Microsoft Agents Copilot Studio console sample.
 
@@ -47,10 +47,10 @@ Update `appsettings.json` with your authentication values:
 }
 ```
 
-The Copilot Studio agent values are already set:
+Set the Copilot Studio agent values for your published agent:
 
 ```json
-"EnvironmentId": "Default-162b57d1-22cf-4a6e-b7a3-4d742c2ae518",
+"EnvironmentId": "<your-copilot-studio-environment-id>",
 "SchemaName": "cr0b4_bilingualPoemCreator"
 ```
 
