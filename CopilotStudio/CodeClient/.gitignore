@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+.vscode/
+
+# Local token cache created by the MSAL sample flow.
+mcs_client_console/
+
+# Optional local config variants.
+appsettings.Development.json
+appsettings.Local.json
